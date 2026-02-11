@@ -186,6 +186,71 @@ main {
   margin-top: 0.5rem;
 }
 
+.warning {
+  margin: 0.6rem 0 0.9rem;
+  color: #7a2e0b;
+  background: #fff4e5;
+  border: 1px solid #fed7aa;
+  border-radius: 8px;
+  padding: 0.6rem 0.8rem;
+}
+
+.checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-bottom: 0.6rem;
+  color: #1f2937;
+  font-size: 0.95rem;
+}
+
+.checkbox-row input {
+  width: 1rem;
+  height: 1rem;
+}
+
+.website-preview {
+  border: 1px solid #d9e3ec;
+  border-radius: 12px;
+  background: #ffffff;
+  overflow: hidden;
+}
+
+.preview-hero {
+  background: linear-gradient(135deg, #14532d, #166534);
+  color: #fff;
+  padding: 1.1rem;
+}
+
+.preview-hero h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  opacity: 0.9;
+}
+
+.preview-hero h4 {
+  margin: 0.35rem 0 0.3rem;
+  font-size: 1.2rem;
+}
+
+.preview-hero p {
+  margin: 0;
+  opacity: 0.95;
+}
+
+.preview-section {
+  border-top: 1px solid #e5edf4;
+  padding: 0.85rem 1rem;
+}
+
+.preview-section h5 {
+  margin: 0 0 0.35rem;
+  font-size: 0.92rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #465463;
+}
+
 .error {
   color: #b91c1c;
   margin-top: 0.5rem;

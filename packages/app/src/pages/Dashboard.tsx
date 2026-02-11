@@ -39,6 +39,7 @@ export const Dashboard = () => {
   const [error, setError] = useState("");
   const [publishNote, setPublishNote] = useState("");
   const [siteDraft, setSiteDraft] = useState<SiteDraft | null>(null);
+  const [usingFallback, setUsingFallback] = useState(false);
 
   const canGenerate = useMemo(() => {
     if (!profileUrl.trim()) return false;
@@ -52,7 +53,7 @@ export const Dashboard = () => {
 
   const generateDraft = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!canGenerate || generating) return;
+    if (!canGenerate || generating || !usingFallback) return;
 
     setGenerating(true);
     setError("");
@@ -135,20 +136,34 @@ export const Dashboard = () => {
       </header>
 
       <section className="panel">
-        <h2>Step 1: Add your Google Business Profile URL</h2>
-        <p className="muted">Example: <code>https://g.page/r/...</code> or your public Maps profile URL.</p>
+        <h2>Step 1: Connect Google Business Profile</h2>
+        <p className="muted">
+          Production mode should connect to Google Business Profile API with OAuth and fetch verified locations.
+        </p>
+        <p className="warning">
+          Temporary fallback only: manual URL input is enabled below for internal testing while API connection is being wired.
+        </p>
+        <label className="checkbox-row">
+          <input
+            type="checkbox"
+            checked={usingFallback}
+            onChange={(event) => setUsingFallback(event.target.checked)}
+          />
+          Enable temporary URL fallback
+        </label>
+        <p className="muted">Fallback input example: <code>https://g.page/r/...</code> or public Maps profile URL.</p>
         <form onSubmit={generateDraft}>
-        <input
+          <input
             type="url"
             placeholder="https://g.page/r/your-business-profile"
             value={profileUrl}
             onChange={(event) => setProfileUrl(event.target.value)}
-          disabled={generating}
+            disabled={generating || !usingFallback}
             required
-        />
-        <button type="submit" disabled={generating}>
-            {generating ? "Generating draft..." : "Generate site draft"}
-        </button>
+          />
+          <button type="submit" disabled={generating || !usingFallback}>
+            {generating ? "Generating draft..." : "Generate site draft from fallback URL"}
+          </button>
         </form>
       </section>
 
@@ -178,6 +193,32 @@ export const Dashboard = () => {
               </li>
             ))}
           </ul>
+        </section>
+      )}
+
+      {siteDraft && (
+        <section className="panel">
+          <h2>Website preview</h2>
+          <p className="muted">This is a visual draft of what the generated site could look like before publish.</p>
+          <article className="website-preview">
+            <header className="preview-hero">
+              <h3>{siteDraft.businessName}</h3>
+              <h4>{siteDraft.headline}</h4>
+              <p>{siteDraft.subheadline}</p>
+            </header>
+            <section className="preview-section">
+              <h5>Services</h5>
+              <p>{siteDraft.pages.find((p) => p.slug === "/services")?.summary}</p>
+            </section>
+            <section className="preview-section">
+              <h5>Reviews</h5>
+              <p>{siteDraft.pages.find((p) => p.slug === "/reviews")?.summary}</p>
+            </section>
+            <section className="preview-section">
+              <h5>Contact</h5>
+              <p>{siteDraft.pages.find((p) => p.slug === "/contact")?.summary}</p>
+            </section>
+          </article>
         </section>
       )}
 
