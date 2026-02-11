@@ -1,6 +1,7 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
+import { supabase } from "../lib/supabase";
 type SiteDraft = {
   businessName: string;
   headline: string;
@@ -40,6 +41,9 @@ export const Dashboard = () => {
   const [publishNote, setPublishNote] = useState("");
   const [siteDraft, setSiteDraft] = useState<SiteDraft | null>(null);
   const [usingFallback, setUsingFallback] = useState(false);
+  const [googleConnected, setGoogleConnected] = useState(false);
+  const [googleEmail, setGoogleEmail] = useState<string | null>(null);
+  const [checkingGoogle, setCheckingGoogle] = useState(false);
 
   const canGenerate = useMemo(() => {
     if (!profileUrl.trim()) return false;
@@ -50,6 +54,78 @@ export const Dashboard = () => {
       return false;
     }
   }, [profileUrl]);
+
+  const getAccessToken = async (): Promise<string> => {
+    const { data } = await supabase.auth.getSession();
+    const token = data.session?.access_token;
+    if (!token) throw new Error("Missing session token");
+    return token;
+  };
+
+  const loadGoogleConnectionStatus = async () => {
+    if (!user) return;
+    setCheckingGoogle(true);
+    try {
+      const token = await getAccessToken();
+      const response = await fetch("/.netlify/functions/google-connection-status", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Failed to load Google status");
+      setGoogleConnected(Boolean(payload.connected));
+      setGoogleEmail(payload.email || null);
+    } catch {
+      setGoogleConnected(false);
+      setGoogleEmail(null);
+    } finally {
+      setCheckingGoogle(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!user) return;
+    loadGoogleConnectionStatus().catch(() => undefined);
+  }, [user]);
+
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const googleStatus = params.get("google");
+    if (!googleStatus) return;
+
+    if (googleStatus === "connected") {
+      setPublishNote("Google Business Profile connected successfully.");
+      loadGoogleConnectionStatus().catch(() => undefined);
+    } else {
+      setError(`Google connection failed (${googleStatus}).`);
+    }
+
+    params.delete("google");
+    const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
+    window.history.replaceState({}, "", nextUrl);
+  }, []);
+
+  const connectGoogleBusiness = async () => {
+    setError("");
+    setPublishNote("");
+    try {
+      const token = await getAccessToken();
+      const response = await fetch("/.netlify/functions/google-connect", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Could not start Google OAuth");
+      if (!payload.authUrl) throw new Error("Missing auth URL");
+      window.location.href = payload.authUrl as string;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Failed to connect Google");
+    }
+  };
 
   const generateDraft = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -140,6 +216,14 @@ export const Dashboard = () => {
         <p className="muted">
           Production mode should connect to Google Business Profile API with OAuth and fetch verified locations.
         </p>
+        <div className="connection-row">
+          <button onClick={connectGoogleBusiness} disabled={checkingGoogle}>
+            {checkingGoogle ? "Checking..." : googleConnected ? "Reconnect Google" : "Connect Google Business"}
+          </button>
+          <span className={googleConnected ? "status-chip ok" : "status-chip"}>
+            {googleConnected ? `Connected${googleEmail ? `: ${googleEmail}` : ""}` : "Not connected"}
+          </span>
+        </div>
         <p className="warning">
           Temporary fallback only: manual URL input is enabled below for internal testing while API connection is being wired.
         </p>
@@ -225,9 +309,14 @@ export const Dashboard = () => {
       <section className="panel">
         <h2>Step 3: Publish</h2>
         <p className="muted">Publishing includes hosted deployment and ongoing sync of phone and hours.</p>
-        <button onClick={requestPublish} disabled={!siteDraft || publishing}>
+        <button onClick={requestPublish} disabled={!siteDraft || publishing || !googleConnected}>
           {publishing ? "Opening checkout..." : "Publish website"}
         </button>
+        {!googleConnected && (
+          <p className="warning" style={{ marginTop: "0.8rem" }}>
+            Connect Google Business before publish is enabled.
+          </p>
+        )}
       </section>
     </main>
   );

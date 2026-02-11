@@ -209,6 +209,30 @@ main {
   height: 1rem;
 }
 
+.connection-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.7rem;
+  margin: 0.7rem 0 0.9rem;
+}
+
+.status-chip {
+  display: inline-block;
+  padding: 0.28rem 0.62rem;
+  border-radius: 999px;
+  border: 1px solid #e5e7eb;
+  background: #f8fafc;
+  color: #374151;
+  font-size: 0.86rem;
+}
+
+.status-chip.ok {
+  border-color: #86efac;
+  background: #dcfce7;
+  color: #166534;
+}
+
 .website-preview {
   border: 1px solid #d9e3ec;
   border-radius: 12px;
