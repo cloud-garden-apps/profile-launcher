@@ -1,6 +1,6 @@
 import type { Context } from "@netlify/functions";
-import { createOAuthState } from "./_crypto";
-import { corsHeaders, getCallbackUrl, handleCors, json, jsonError, requireUser } from "./_auth";
+import { createOAuthState } from "./crypto-utils";
+import { corsHeaders, getCallbackUrl, handleCors, json, jsonError, requireUser } from "./auth-utils";
 
 const GOOGLE_SCOPE = [
   "openid",

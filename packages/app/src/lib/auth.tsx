@@ -1,14 +1,14 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
+import { APP_ORIGIN_FALLBACK } from "../config/constants";
 
 const APP_ID = import.meta.env.VITE_APP_ID;
-const PROD_APP_URL = "https://profile-launcher-app.netlify.app";
 
 const getRedirectUrl = (): string => {
-  if (typeof window === "undefined") return PROD_APP_URL;
+  if (typeof window === "undefined") return APP_ORIGIN_FALLBACK;
   const origin = window.location.origin;
-  return origin.includes("localhost") ? PROD_APP_URL : origin;
+  return origin.includes("localhost") ? APP_ORIGIN_FALLBACK : origin;
 };
 
 type AuthContextType = {

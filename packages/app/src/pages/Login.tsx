@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../lib/auth";
+import { t } from "../i18n";
 
 export const Login = () => {
   const { signInWithMagicLink, signInWithGoogle } = useAuth();
@@ -36,14 +37,14 @@ export const Login = () => {
     return (
       <main className="auth-shell">
         <div className="auth-card">
-          <p className="eyebrow">ProfileLauncher</p>
-          <h1>Check your email</h1>
-          <p>We sent a login link to <strong>{email}</strong>.</p>
+          <p className="eyebrow">{t("common.appName")}</p>
+          <h1>{t("login.checkEmailTitle")}</h1>
+          <p>{t("login.checkEmailBody", { email })}</p>
           <p className="muted">
-          Click the link in the email to sign in.
+            {t("login.checkEmailHint")}
           </p>
           <button onClick={() => setEmailSent(false)}>
-            Use a different email
+            {t("login.useDifferentEmail")}
           </button>
         </div>
       </main>
@@ -53,26 +54,26 @@ export const Login = () => {
   return (
     <main className="auth-shell">
       <div className="auth-card">
-        <p className="eyebrow">ProfileLauncher</p>
-        <h1>Sign in</h1>
-        <p className="muted">Turn your Google Business Profile into a website and publish today.</p>
+        <p className="eyebrow">{t("common.appName")}</p>
+        <h1>{t("login.title")}</h1>
+        <p className="muted">{t("login.subtitle")}</p>
 
         <button onClick={handleGoogle} className="full">
-          Continue with Google
+          {t("login.continueWithGoogle")}
         </button>
 
-        <div className="divider">or</div>
+        <div className="divider">{t("common.or")}</div>
 
         <form onSubmit={handleMagicLink}>
           <input
             type="email"
-            placeholder="Email"
+            placeholder={t("login.emailPlaceholder")}
             value={email}
             onChange={(event) => setEmail(event.target.value)}
             required
           />
           <button type="submit" disabled={loading} className="full">
-            {loading ? "Sending..." : "Send magic link"}
+            {loading ? t("login.sendingMagicLink") : t("login.sendMagicLink")}
           </button>
           {error && <p className="error">{error}</p>}
         </form>

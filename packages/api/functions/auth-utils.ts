@@ -1,4 +1,5 @@
 import type { Context } from "@netlify/functions";
+import { APP_ORIGIN_FALLBACK, GOOGLE_CALLBACK_PATH } from "./constants";
 
 type AuthenticatedUser = {
   id: string;
@@ -71,12 +72,12 @@ export const resolveAppOrigin = (request: Request): string => {
 
   const host = request.headers.get("x-forwarded-host") || request.headers.get("host");
   const proto = request.headers.get("x-forwarded-proto") || "https";
-  if (!host) return "https://profile-launcher-app.netlify.app";
+  if (!host) return APP_ORIGIN_FALLBACK;
   return `${proto}://${host}`;
 };
 
 export const getCallbackUrl = (request: Request): string => {
   const explicit = process.env.GOOGLE_OAUTH_REDIRECT_URI;
   if (explicit) return explicit;
-  return `${resolveAppOrigin(request)}/.netlify/functions/google-callback`;
+  return `${resolveAppOrigin(request)}${GOOGLE_CALLBACK_PATH}`;
 };

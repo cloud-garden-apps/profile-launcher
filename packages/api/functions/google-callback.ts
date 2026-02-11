@@ -1,6 +1,6 @@
 import type { Context } from "@netlify/functions";
-import { encryptToken, verifyOAuthState } from "./_crypto";
-import { getAppId, getCallbackUrl, resolveAppOrigin } from "./_auth";
+import { encryptToken, verifyOAuthState } from "./crypto-utils";
+import { getAppId, getCallbackUrl, resolveAppOrigin } from "./auth-utils";
 
 type GoogleTokenResponse = {
   access_token?: string;

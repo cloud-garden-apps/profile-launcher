@@ -2,6 +2,9 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
 import { supabase } from "../lib/supabase";
+import { API_ROUTES } from "../config/constants";
+import { t } from "../i18n";
+
 type SiteDraft = {
   businessName: string;
   headline: string;
@@ -16,18 +19,19 @@ const mockDraft = (profileUrl: string): SiteDraft => {
   const hostname = parsed.hostname.replace("www.", "");
   const seed = hostname.split(".")[0].replace(/[-_]/g, " ");
   const business = seed.replace(/\b\w/g, (c) => c.toUpperCase());
+
   return {
-    businessName: business || "Your Business",
-    headline: `${business} now has a professional website.`,
-    subheadline: "Generated from your Google Business Profile with local SEO structure included.",
-    seoTitle: `${business} | Trusted Local Service`,
-    seoDescription: `Visit ${business} for reliable local service. Hours, phone, and business profile details stay synced.`,
+    businessName: business || t("dashboard.mockBusinessName"),
+    headline: t("dashboard.mockHeadline", { business: business || t("dashboard.mockBusinessName") }),
+    subheadline: t("dashboard.mockSubheadline"),
+    seoTitle: t("dashboard.mockSeoTitle", { business: business || t("dashboard.mockBusinessName") }),
+    seoDescription: t("dashboard.mockSeoDescription", { business: business || t("dashboard.mockBusinessName") }),
     pages: [
-      { slug: "/", title: "Home", summary: "Core services, trust badges, and contact CTA." },
-      { slug: "/services", title: "Services", summary: "Service list optimized for local intent searches." },
-      { slug: "/about", title: "About", summary: "Owner story, values, and location credibility." },
-      { slug: "/reviews", title: "Reviews", summary: "Social proof pulled from your profile ratings." },
-      { slug: "/contact", title: "Contact", summary: "Phone, hours, map links, and lead form." },
+      { slug: "/", title: t("dashboard.pageHomeTitle"), summary: t("dashboard.pageHomeSummary") },
+      { slug: "/services", title: t("dashboard.pageServicesTitle"), summary: t("dashboard.pageServicesSummary") },
+      { slug: "/about", title: t("dashboard.pageAboutTitle"), summary: t("dashboard.pageAboutSummary") },
+      { slug: "/reviews", title: t("dashboard.pageReviewsTitle"), summary: t("dashboard.pageReviewsSummary") },
+      { slug: "/contact", title: t("dashboard.pageContactTitle"), summary: t("dashboard.pageContactSummary") },
     ],
   };
 };
@@ -58,7 +62,7 @@ export const Dashboard = () => {
   const getAccessToken = async (): Promise<string> => {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
-    if (!token) throw new Error("Missing session token");
+    if (!token) throw new Error(t("dashboard.errMissingSessionToken"));
     return token;
   };
 
@@ -67,14 +71,14 @@ export const Dashboard = () => {
     setCheckingGoogle(true);
     try {
       const token = await getAccessToken();
-      const response = await fetch("/.netlify/functions/google-connection-status", {
+      const response = await fetch(API_ROUTES.googleConnectionStatus, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Failed to load Google status");
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errGoogleStatus"));
       setGoogleConnected(Boolean(payload.connected));
       setGoogleEmail(payload.email || null);
     } catch {
@@ -96,7 +100,7 @@ export const Dashboard = () => {
     if (!googleStatus) return;
 
     if (googleStatus === "connected") {
-      setPublishNote("Google Business Profile connected successfully.");
+      setPublishNote(t("dashboard.noteGoogleConnected"));
       loadGoogleConnectionStatus().catch(() => undefined);
     } else {
       setError(`Google connection failed (${googleStatus}).`);
@@ -112,18 +116,18 @@ export const Dashboard = () => {
     setPublishNote("");
     try {
       const token = await getAccessToken();
-      const response = await fetch("/.netlify/functions/google-connect", {
+      const response = await fetch(API_ROUTES.googleConnect, {
         method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Could not start Google OAuth");
-      if (!payload.authUrl) throw new Error("Missing auth URL");
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errGoogleConnect"));
+      if (!payload.authUrl) throw new Error(t("dashboard.errGoogleConnect"));
       window.location.href = payload.authUrl as string;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to connect Google");
+      setError(err instanceof Error ? err.message : t("dashboard.errGoogleConnect"));
     }
   };
 
@@ -136,18 +140,20 @@ export const Dashboard = () => {
     setPublishNote("");
 
     try {
-      const response = await fetch("/.netlify/functions/generate-site-draft", {
+      const response = await fetch(API_ROUTES.generateSiteDraft, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ profileUrl }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Draft generation failed");
-      if (!payload.siteDraft) throw new Error("Missing site draft in response");
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errDraftGenerate"));
+      if (!payload.siteDraft) throw new Error(t("dashboard.errDraftMissing"));
       setSiteDraft(payload.siteDraft as SiteDraft);
     } catch (err) {
       setSiteDraft(mockDraft(profileUrl));
-      setError(err instanceof Error ? `${err.message}. Loaded fallback draft.` : "Loaded fallback draft.");
+      setError(
+        err instanceof Error ? `${err.message}. ${t("dashboard.errDraftFallback")}` : t("dashboard.errDraftFallback")
+      );
     } finally {
       setGenerating(false);
     }
@@ -159,7 +165,7 @@ export const Dashboard = () => {
     setError("");
     setPublishNote("");
     try {
-      const response = await fetch("/.netlify/functions/create-checkout", {
+      const response = await fetch(API_ROUTES.createCheckout, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -168,30 +174,30 @@ export const Dashboard = () => {
         }),
       });
       const payload = await response.json();
-      if (!response.ok) throw new Error(payload.error || "Checkout failed");
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errCheckoutFailed"));
       if (payload.url) {
         window.location.href = payload.url;
         return;
       }
-      setPublishNote("Checkout created, but no URL returned.");
+      setPublishNote(t("dashboard.noteCheckoutNoUrl"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not start checkout");
+      setError(err instanceof Error ? err.message : t("dashboard.errCheckoutStart"));
     } finally {
       setPublishing(false);
     }
   };
 
-  if (loading) return <div>Loading...</div>;
+  if (loading) return <div>{t("common.loading")}</div>;
 
   if (!user) {
     return (
       <main className="auth-shell">
         <div className="auth-card">
-          <p className="eyebrow">ProfileLauncher</p>
-          <h1>Launch your business site</h1>
-          <p className="muted">Sign in to import your Google Business Profile and generate a live website.</p>
+          <p className="eyebrow">{t("common.appName")}</p>
+          <h1>{t("dashboard.signedOutTitle")}</h1>
+          <p className="muted">{t("dashboard.signedOutSubtitle")}</p>
           <p style={{ marginTop: "1rem" }}>
-          <Link to="/login">Sign in</Link> to get started.
+            <Link to="/login">{t("dashboard.signedOutCta")}</Link> {t("dashboard.signedOutCtaSuffix")}
           </p>
         </div>
       </main>
@@ -202,51 +208,55 @@ export const Dashboard = () => {
     <main className="dashboard-shell">
       <header className="dash-header">
         <div>
-          <p className="eyebrow">ProfileLauncher</p>
-          <h1>Build and publish your website</h1>
+          <p className="eyebrow">{t("common.appName")}</p>
+          <h1>{t("dashboard.title")}</h1>
         </div>
         <div>
           <span className="user-pill">{user.email}</span>
-          <button onClick={signOut}>Logout</button>
+          <button onClick={signOut}>{t("common.logout")}</button>
         </div>
       </header>
 
       <section className="panel">
-        <h2>Step 1: Connect Google Business Profile</h2>
-        <p className="muted">
-          Production mode should connect to Google Business Profile API with OAuth and fetch verified locations.
-        </p>
+        <h2>{t("dashboard.connectStepTitle")}</h2>
+        <p className="muted">{t("dashboard.connectStepBody")}</p>
         <div className="connection-row">
           <button onClick={connectGoogleBusiness} disabled={checkingGoogle}>
-            {checkingGoogle ? "Checking..." : googleConnected ? "Reconnect Google" : "Connect Google Business"}
+            {checkingGoogle
+              ? t("common.checking")
+              : googleConnected
+                ? t("dashboard.reconnectButton")
+                : t("dashboard.connectButton")}
           </button>
           <span className={googleConnected ? "status-chip ok" : "status-chip"}>
-            {googleConnected ? `Connected${googleEmail ? `: ${googleEmail}` : ""}` : "Not connected"}
+            {googleConnected
+              ? `${t("dashboard.connectedStatus")}${googleEmail ? `: ${googleEmail}` : ""}`
+              : t("dashboard.notConnectedStatus")}
           </span>
         </div>
-        <p className="warning">
-          Temporary fallback only: manual URL input is enabled below for internal testing while API connection is being wired.
-        </p>
+        <p className="warning">{t("dashboard.fallbackWarning")}</p>
         <label className="checkbox-row">
           <input
             type="checkbox"
             checked={usingFallback}
             onChange={(event) => setUsingFallback(event.target.checked)}
           />
-          Enable temporary URL fallback
+          {t("dashboard.fallbackEnable")}
         </label>
-        <p className="muted">Fallback input example: <code>https://g.page/r/...</code> or public Maps profile URL.</p>
+        <p className="muted">
+          {t("dashboard.fallbackExample")} <code>https://g.page/r/...</code>
+        </p>
         <form onSubmit={generateDraft}>
           <input
             type="url"
-            placeholder="https://g.page/r/your-business-profile"
+            placeholder={t("dashboard.fallbackPlaceholder")}
             value={profileUrl}
             onChange={(event) => setProfileUrl(event.target.value)}
             disabled={generating || !usingFallback}
             required
           />
           <button type="submit" disabled={generating || !usingFallback}>
-            {generating ? "Generating draft..." : "Generate site draft from fallback URL"}
+            {generating ? t("dashboard.generatingDraft") : t("dashboard.generateDraft")}
           </button>
         </form>
       </section>
@@ -256,19 +266,19 @@ export const Dashboard = () => {
 
       {siteDraft && (
         <section className="panel">
-          <h2>Step 2: Review your generated site draft</h2>
+          <h2>{t("dashboard.draftStepTitle")}</h2>
           <div className="draft-grid">
             <article className="draft-card">
               <h3>{siteDraft.headline}</h3>
               <p>{siteDraft.subheadline}</p>
             </article>
             <article className="draft-card">
-              <h3>SEO Preview</h3>
+              <h3>{t("dashboard.seoPreviewTitle")}</h3>
               <p><strong>{siteDraft.seoTitle}</strong></p>
               <p>{siteDraft.seoDescription}</p>
             </article>
           </div>
-          <h3>Planned pages</h3>
+          <h3>{t("dashboard.plannedPagesTitle")}</h3>
           <ul className="page-list">
             {siteDraft.pages.map((page) => (
               <li key={page.slug}>
@@ -282,8 +292,8 @@ export const Dashboard = () => {
 
       {siteDraft && (
         <section className="panel">
-          <h2>Website preview</h2>
-          <p className="muted">This is a visual draft of what the generated site could look like before publish.</p>
+          <h2>{t("dashboard.previewStepTitle")}</h2>
+          <p className="muted">{t("dashboard.previewBody")}</p>
           <article className="website-preview">
             <header className="preview-hero">
               <h3>{siteDraft.businessName}</h3>
@@ -291,15 +301,15 @@ export const Dashboard = () => {
               <p>{siteDraft.subheadline}</p>
             </header>
             <section className="preview-section">
-              <h5>Services</h5>
+              <h5>{t("dashboard.previewServices")}</h5>
               <p>{siteDraft.pages.find((p) => p.slug === "/services")?.summary}</p>
             </section>
             <section className="preview-section">
-              <h5>Reviews</h5>
+              <h5>{t("dashboard.previewReviews")}</h5>
               <p>{siteDraft.pages.find((p) => p.slug === "/reviews")?.summary}</p>
             </section>
             <section className="preview-section">
-              <h5>Contact</h5>
+              <h5>{t("dashboard.previewContact")}</h5>
               <p>{siteDraft.pages.find((p) => p.slug === "/contact")?.summary}</p>
             </section>
           </article>
@@ -307,14 +317,14 @@ export const Dashboard = () => {
       )}
 
       <section className="panel">
-        <h2>Step 3: Publish</h2>
-        <p className="muted">Publishing includes hosted deployment and ongoing sync of phone and hours.</p>
+        <h2>{t("dashboard.publishStepTitle")}</h2>
+        <p className="muted">{t("dashboard.publishBody")}</p>
         <button onClick={requestPublish} disabled={!siteDraft || publishing || !googleConnected}>
-          {publishing ? "Opening checkout..." : "Publish website"}
+          {publishing ? t("dashboard.openingCheckout") : t("dashboard.publishButton")}
         </button>
         {!googleConnected && (
           <p className="warning" style={{ marginTop: "0.8rem" }}>
-            Connect Google Business before publish is enabled.
+            {t("dashboard.publishRequiresConnection")}
           </p>
         )}
       </section>

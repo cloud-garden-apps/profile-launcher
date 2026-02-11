@@ -1,5 +1,5 @@
 import type { Context } from "@netlify/functions";
-import { corsHeaders, getAppId, handleCors, json, jsonError, requireUser } from "./_auth";
+import { corsHeaders, getAppId, handleCors, json, jsonError, requireUser } from "./auth-utils";
 
 export default async (request: Request, _context: Context) => {
   const cors = handleCors(request);

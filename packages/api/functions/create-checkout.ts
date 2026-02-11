@@ -1,4 +1,5 @@
 import type { Context } from "@netlify/functions";
+import { APP_ORIGIN_FALLBACK, CHECKOUT_CANCEL_PATH, CHECKOUT_SUCCESS_PATH } from "./constants";
 
 export default async (request: Request, context: Context) => {
   if (request.method !== "POST") {
@@ -22,8 +23,8 @@ export default async (request: Request, context: Context) => {
       mode: "subscription",
       "line_items[0][price]": resolvedPriceId,
       "line_items[0][quantity]": "1",
-      success_url: successUrl || "https://profile-launcher-app.netlify.app/?success=true",
-      cancel_url: cancelUrl || "https://profile-launcher-app.netlify.app/?canceled=true",
+      success_url: successUrl || `${APP_ORIGIN_FALLBACK}${CHECKOUT_SUCCESS_PATH}`,
+      cancel_url: cancelUrl || `${APP_ORIGIN_FALLBACK}${CHECKOUT_CANCEL_PATH}`,
     }),
   });
 
