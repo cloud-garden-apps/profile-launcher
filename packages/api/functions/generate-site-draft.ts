@@ -17,7 +17,7 @@ const extractJsonObject = (text: string): SiteDraft => {
   return JSON.parse(match[0]) as SiteDraft;
 };
 
-const generateDraft = async (profileUrl: string): Promise<SiteDraft> => {
+const generateDraft = async (input: { profileUrl?: string; businessName?: string }): Promise<SiteDraft> => {
   const apiKey = process.env.GEMINI_API_KEY;
   const model = process.env.GOOGLE_MODEL || "gemini-2.5-flash-lite";
 
@@ -27,7 +27,8 @@ const generateDraft = async (profileUrl: string): Promise<SiteDraft> => {
 
   const prompt = [
     "You are creating a local business website draft.",
-    `Google Business Profile URL: ${profileUrl}`,
+    `Google Business Profile URL: ${input.profileUrl || "not provided"}`,
+    `Business Name: ${input.businessName || "not provided"}`,
     "Generate realistic, concise copy for a professional local business website.",
     "Respond with JSON only in this exact shape:",
     "{",
@@ -92,21 +93,24 @@ export default async (request: Request, _context: Context) => {
 
   try {
     const payload = await request.json();
-    const profileUrl = payload?.profileUrl;
+    const profileUrl = typeof payload?.profileUrl === "string" ? payload.profileUrl : "";
+    const businessName = typeof payload?.businessName === "string" ? payload.businessName : "";
 
-    if (!profileUrl || typeof profileUrl !== "string") {
-      return new Response(JSON.stringify({ error: "Missing profileUrl" }), {
+    if (!profileUrl && !businessName) {
+      return new Response(JSON.stringify({ error: "Missing profileUrl or businessName" }), {
         status: 400,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
     }
 
-    const parsed = new URL(profileUrl);
-    if (!parsed.protocol.startsWith("http")) {
-      throw new Error("profileUrl must be http or https");
+    if (profileUrl) {
+      const parsed = new URL(profileUrl);
+      if (!parsed.protocol.startsWith("http")) {
+        throw new Error("profileUrl must be http or https");
+      }
     }
 
-    const siteDraft = await generateDraft(profileUrl);
+    const siteDraft = await generateDraft({ profileUrl, businessName });
 
     return new Response(JSON.stringify({ siteDraft }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

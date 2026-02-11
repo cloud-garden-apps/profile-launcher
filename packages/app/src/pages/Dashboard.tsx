@@ -14,6 +14,15 @@ type SiteDraft = {
   pages: Array<{ slug: string; title: string; summary: string }>;
 };
 
+type GoogleBusiness = {
+  id: string;
+  name: string;
+  accountName: string;
+  websiteUri: string | null;
+  phone: string | null;
+  address: string | null;
+};
+
 const mockDraft = (profileUrl: string): SiteDraft => {
   const parsed = new URL(profileUrl);
   const hostname = parsed.hostname.replace("www.", "");
@@ -48,8 +57,11 @@ export const Dashboard = () => {
   const [googleConnected, setGoogleConnected] = useState(false);
   const [googleEmail, setGoogleEmail] = useState<string | null>(null);
   const [checkingGoogle, setCheckingGoogle] = useState(false);
+  const [loadingBusinesses, setLoadingBusinesses] = useState(false);
+  const [businesses, setBusinesses] = useState<GoogleBusiness[]>([]);
+  const [selectedBusinessId, setSelectedBusinessId] = useState("");
 
-  const canGenerate = useMemo(() => {
+  const canGenerateFromFallback = useMemo(() => {
     if (!profileUrl.trim()) return false;
     try {
       const parsed = new URL(profileUrl);
@@ -59,11 +71,51 @@ export const Dashboard = () => {
     }
   }, [profileUrl]);
 
+  const selectedBusiness = useMemo(
+    () => businesses.find((business) => business.id === selectedBusinessId) || null,
+    [businesses, selectedBusinessId]
+  );
+
+  const canGenerate = Boolean(selectedBusiness) || (usingFallback && canGenerateFromFallback);
+
   const getAccessToken = async (): Promise<string> => {
     const { data } = await supabase.auth.getSession();
     const token = data.session?.access_token;
     if (!token) throw new Error(t("dashboard.errMissingSessionToken"));
     return token;
+  };
+
+  const loadGoogleBusinesses = async () => {
+    if (!user) return;
+    setLoadingBusinesses(true);
+    try {
+      const token = await getAccessToken();
+      const response = await fetch(API_ROUTES.googleBusinesses, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errGoogleBusinesses"));
+
+      const nextBusinesses = Array.isArray(payload.businesses) ? (payload.businesses as GoogleBusiness[]) : [];
+      setBusinesses(nextBusinesses);
+      if (!nextBusinesses.length) {
+        setSelectedBusinessId("");
+        return;
+      }
+
+      setSelectedBusinessId((current) =>
+        current && nextBusinesses.some((business) => business.id === current) ? current : nextBusinesses[0].id
+      );
+    } catch {
+      setBusinesses([]);
+      setSelectedBusinessId("");
+    } finally {
+      setLoadingBusinesses(false);
+    }
   };
 
   const loadGoogleConnectionStatus = async () => {
@@ -81,9 +133,17 @@ export const Dashboard = () => {
       if (!response.ok) throw new Error(payload.error || t("dashboard.errGoogleStatus"));
       setGoogleConnected(Boolean(payload.connected));
       setGoogleEmail(payload.email || null);
+      if (payload.connected) {
+        await loadGoogleBusinesses();
+      } else {
+        setBusinesses([]);
+        setSelectedBusinessId("");
+      }
     } catch {
       setGoogleConnected(false);
       setGoogleEmail(null);
+      setBusinesses([]);
+      setSelectedBusinessId("");
     } finally {
       setCheckingGoogle(false);
     }
@@ -133,24 +193,36 @@ export const Dashboard = () => {
 
   const generateDraft = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!canGenerate || generating || !usingFallback) return;
+    if (!canGenerate || generating) return;
 
     setGenerating(true);
     setError("");
     setPublishNote("");
 
     try {
+      const payloadBody = selectedBusiness
+        ? {
+            businessName: selectedBusiness.name,
+            profileUrl: selectedBusiness.websiteUri || "",
+          }
+        : {
+            profileUrl,
+          };
+
       const response = await fetch(API_ROUTES.generateSiteDraft, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ profileUrl }),
+        body: JSON.stringify(payloadBody),
       });
       const payload = await response.json();
       if (!response.ok) throw new Error(payload.error || t("dashboard.errDraftGenerate"));
       if (!payload.siteDraft) throw new Error(t("dashboard.errDraftMissing"));
       setSiteDraft(payload.siteDraft as SiteDraft);
     } catch (err) {
-      setSiteDraft(mockDraft(profileUrl));
+      const fallbackSeed = selectedBusiness?.websiteUri || profileUrl;
+      if (fallbackSeed) {
+        setSiteDraft(mockDraft(fallbackSeed));
+      }
       setError(
         err instanceof Error ? `${err.message}. ${t("dashboard.errDraftFallback")}` : t("dashboard.errDraftFallback")
       );
@@ -234,6 +306,29 @@ export const Dashboard = () => {
               : t("dashboard.notConnectedStatus")}
           </span>
         </div>
+        {googleConnected && (
+          <>
+            <label htmlFor="business-select">{t("dashboard.businessSelectLabel")}</label>
+            <select
+              id="business-select"
+              value={selectedBusinessId}
+              onChange={(event) => setSelectedBusinessId(event.target.value)}
+              disabled={loadingBusinesses || businesses.length === 0}
+            >
+              {loadingBusinesses && <option value="">{t("dashboard.businessLoading")}</option>}
+              {!loadingBusinesses && businesses.length === 0 && (
+                <option value="">{t("dashboard.businessNoneFound")}</option>
+              )}
+              {!loadingBusinesses &&
+                businesses.map((business) => (
+                  <option key={business.id} value={business.id}>
+                    {business.name}
+                  </option>
+                ))}
+            </select>
+            {selectedBusiness?.address && <p className="muted">{selectedBusiness.address}</p>}
+          </>
+        )}
         <p className="warning">{t("dashboard.fallbackWarning")}</p>
         <label className="checkbox-row">
           <input
@@ -253,10 +348,14 @@ export const Dashboard = () => {
             value={profileUrl}
             onChange={(event) => setProfileUrl(event.target.value)}
             disabled={generating || !usingFallback}
-            required
+            required={usingFallback}
           />
-          <button type="submit" disabled={generating || !usingFallback}>
-            {generating ? t("dashboard.generatingDraft") : t("dashboard.generateDraft")}
+          <button type="submit" disabled={generating || !canGenerate}>
+            {generating
+              ? t("dashboard.generatingDraft")
+              : selectedBusiness
+                ? t("dashboard.generateDraftFromBusiness")
+                : t("dashboard.generateDraft")}
           </button>
         </form>
       </section>
