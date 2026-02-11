@@ -17,10 +17,10 @@ export default async (request: Request, context: Context) => {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: "Spark <onboarding@resend.dev>",
+      from: "ProfileLauncher <onboarding@resend.dev>",
       to: email,
-      subject: "Welcome to Spark!",
-      html: `<h1>Welcome to Spark!</h1><p>Thanks for signing up. Start turning your thoughts into business ideas.</p>`,
+      subject: "Welcome to ProfileLauncher!",
+      html: `<h1>Welcome to ProfileLauncher!</h1><p>Thanks for signing up. Connect your Google Business Profile and launch your website today.</p>`,
     }),
   });
 

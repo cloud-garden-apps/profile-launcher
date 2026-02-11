@@ -3,18 +3,126 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spark</title>
+  <title>ProfileLauncher | Turn Your Google Profile Into a Website</title>
+  <meta name="description" content="ProfileLauncher creates a professional website from your Google Business Profile and keeps key details in sync." />
   <style>
-    body { font-family: -apple-system, sans-serif; max-width: 600px; margin: 4rem auto; padding: 2rem; text-align: center; }
-    h1 { margin-bottom: 0.5rem; }
-    p { color: #666; margin-bottom: 2rem; }
-    a { display: inline-block; padding: 1rem 2rem; background: #333; color: white; text-decoration: none; border-radius: 4px; }
-    a:hover { background: #555; }
+    :root {
+      --bg: #f2f5f8;
+      --ink: #0f1720;
+      --muted: #4a5a68;
+      --accent: #166534;
+      --accent-dark: #14532d;
+      --card: #ffffff;
+      --border: #d6e2ec;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: "Avenir Next", "Avenir", "Segoe UI", sans-serif;
+      color: var(--ink);
+      background: radial-gradient(circle at top right, #d7f2e1, var(--bg) 35%);
+      line-height: 1.5;
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 3rem 1.25rem 4rem;
+    }
+    .hero {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 2rem;
+      box-shadow: 0 10px 30px rgba(15, 23, 32, 0.08);
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      color: #0f5132;
+      background: #d1fae5;
+      border-radius: 999px;
+      padding: 0.35rem 0.65rem;
+      margin-bottom: 1rem;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(2rem, 5vw, 3.3rem);
+      line-height: 1.05;
+    }
+    .sub {
+      margin: 1rem 0 0;
+      color: var(--muted);
+      max-width: 52ch;
+      font-size: 1.1rem;
+    }
+    .cta {
+      margin-top: 1.5rem;
+      display: inline-block;
+      background: var(--accent);
+      color: #fff;
+      text-decoration: none;
+      border-radius: 10px;
+      padding: 0.85rem 1.15rem;
+      font-weight: 600;
+    }
+    .cta:hover { background: var(--accent-dark); }
+    .grid {
+      margin-top: 1.5rem;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+      gap: 0.85rem;
+    }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1rem;
+    }
+    .card h3 {
+      margin-top: 0;
+      margin-bottom: 0.35rem;
+      font-size: 1rem;
+    }
+    .card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .foot {
+      margin-top: 1rem;
+      color: #617280;
+      font-size: 0.88rem;
+    }
   </style>
 </head>
 <body>
-  <h1>Spark</h1>
-  <p>Turn thoughts into business ideas.</p>
-  <a href="https://cloud-garden-spark-app.netlify.app">Launch App</a>
+  <main class="wrap">
+    <section class="hero">
+      <span class="badge">ProfileLauncher Beta</span>
+      <h1>Your Google Business Profile deserves a real website.</h1>
+      <p class="sub">
+        ProfileLauncher turns your profile into a polished website, then keeps key fields in sync so your business info stays current.
+      </p>
+      <a class="cta" href="https://profile-launcher-app.netlify.app">Open The App</a>
+      <div class="grid">
+        <div class="card">
+          <h3>1. Connect profile</h3>
+          <p>Paste your Google Business Profile URL to import business details.</p>
+        </div>
+        <div class="card">
+          <h3>2. Generate website</h3>
+          <p>Create a homepage, services, about, reviews, and contact draft in minutes.</p>
+        </div>
+        <div class="card">
+          <h3>3. Publish confidently</h3>
+          <p>Launch with local SEO basics and managed sync for hours and phone.</p>
+        </div>
+      </div>
+      <p class="foot">For now, subdomain hosting is included. Custom domains are planned next.</p>
+    </section>
+  </main>
 </body>
 </html>

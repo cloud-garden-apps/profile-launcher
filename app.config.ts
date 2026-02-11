@@ -1,10 +1,10 @@
 export const appConfig = {
-  name: "Spark",
-  description: "Turn thoughts into business ideas.",
+  name: "ProfileLauncher",
+  description: "Turn a Google Business Profile into a professional website.",
 
   netlify: {
-    landingSiteName: "cloud-garden-spark-landing",
-    appSiteName: "cloud-garden-spark-app",
+    landingSiteName: "profile-launcher-landing",
+    appSiteName: "profile-launcher-app",
   },
 
   supabase: {

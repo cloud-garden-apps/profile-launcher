@@ -26,7 +26,7 @@ const deployToNetlify = (siteId: string, sourceDir: string, includeFunctions: bo
     cpSync(functionsSource, functionsTarget, { recursive: true });
   }
 
-  const command = `netlify deploy --dir=. --prod`;
+  const command = `netlify deploy --dir=. --prod --site=${siteId}`;
   const env = {
     ...process.env,
     NETLIFY_SITE_ID: siteId,

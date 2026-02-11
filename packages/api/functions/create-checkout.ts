@@ -6,6 +6,11 @@ export default async (request: Request, context: Context) => {
   }
 
   const { priceId, successUrl, cancelUrl } = await request.json();
+  const resolvedPriceId = priceId || process.env.STRIPE_PRICE_ID;
+
+  if (!resolvedPriceId) {
+    return new Response(JSON.stringify({ error: "Missing Stripe price id" }), { status: 400 });
+  }
 
   const response = await fetch("https://api.stripe.com/v1/checkout/sessions", {
     method: "POST",
@@ -15,10 +20,10 @@ export default async (request: Request, context: Context) => {
     },
     body: new URLSearchParams({
       mode: "subscription",
-      "line_items[0][price]": priceId,
+      "line_items[0][price]": resolvedPriceId,
       "line_items[0][quantity]": "1",
-      success_url: successUrl || "https://cloud-garden-spark-app.netlify.app/?success=true",
-      cancel_url: cancelUrl || "https://cloud-garden-spark-app.netlify.app/?canceled=true",
+      success_url: successUrl || "https://profile-launcher-app.netlify.app/?success=true",
+      cancel_url: cancelUrl || "https://profile-launcher-app.netlify.app/?canceled=true",
     }),
   });
 

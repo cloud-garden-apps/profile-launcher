@@ -1,111 +1,193 @@
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "../lib/auth";
-import { Thought, saveThought, getThoughts, deleteThought } from "../lib/thoughts";
+type SiteDraft = {
+  businessName: string;
+  headline: string;
+  subheadline: string;
+  seoTitle: string;
+  seoDescription: string;
+  pages: Array<{ slug: string; title: string; summary: string }>;
+};
+
+const mockDraft = (profileUrl: string): SiteDraft => {
+  const parsed = new URL(profileUrl);
+  const hostname = parsed.hostname.replace("www.", "");
+  const seed = hostname.split(".")[0].replace(/[-_]/g, " ");
+  const business = seed.replace(/\b\w/g, (c) => c.toUpperCase());
+  return {
+    businessName: business || "Your Business",
+    headline: `${business} now has a professional website.`,
+    subheadline: "Generated from your Google Business Profile with local SEO structure included.",
+    seoTitle: `${business} | Trusted Local Service`,
+    seoDescription: `Visit ${business} for reliable local service. Hours, phone, and business profile details stay synced.`,
+    pages: [
+      { slug: "/", title: "Home", summary: "Core services, trust badges, and contact CTA." },
+      { slug: "/services", title: "Services", summary: "Service list optimized for local intent searches." },
+      { slug: "/about", title: "About", summary: "Owner story, values, and location credibility." },
+      { slug: "/reviews", title: "Reviews", summary: "Social proof pulled from your profile ratings." },
+      { slug: "/contact", title: "Contact", summary: "Phone, hours, map links, and lead form." },
+    ],
+  };
+};
 
 export const Dashboard = () => {
   const { user, loading, signOut } = useAuth();
-  const [thought, setThought] = useState("");
-  const [thoughts, setThoughts] = useState<Thought[]>([]);
+  const [profileUrl, setProfileUrl] = useState("");
   const [generating, setGenerating] = useState(false);
+  const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState("");
+  const [publishNote, setPublishNote] = useState("");
+  const [siteDraft, setSiteDraft] = useState<SiteDraft | null>(null);
 
-  useEffect(() => {
-    if (user) {
-      getThoughts().then(setThoughts).catch(console.error);
+  const canGenerate = useMemo(() => {
+    if (!profileUrl.trim()) return false;
+    try {
+      const parsed = new URL(profileUrl);
+      return parsed.protocol.startsWith("http");
+    } catch {
+      return false;
     }
-  }, [user]);
+  }, [profileUrl]);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const generateDraft = async (event: React.FormEvent) => {
     event.preventDefault();
-    if (!thought.trim() || generating) return;
+    if (!canGenerate || generating) return;
 
     setGenerating(true);
     setError("");
+    setPublishNote("");
 
     try {
-      const response = await fetch("/.netlify/functions/generate-ideas", {
+      const response = await fetch("/.netlify/functions/generate-site-draft", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ thought }),
+        body: JSON.stringify({ profileUrl }),
       });
-
-      const data = await response.json();
-      if (!response.ok) throw new Error(data.error);
-
-      const saved = await saveThought(thought, data.ideas);
-      setThoughts([saved, ...thoughts]);
-      setThought("");
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Draft generation failed");
+      if (!payload.siteDraft) throw new Error("Missing site draft in response");
+      setSiteDraft(payload.siteDraft as SiteDraft);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to generate ideas");
+      setSiteDraft(mockDraft(profileUrl));
+      setError(err instanceof Error ? `${err.message}. Loaded fallback draft.` : "Loaded fallback draft.");
     } finally {
       setGenerating(false);
     }
   };
 
-  const handleDelete = async (id: string) => {
-    await deleteThought(id);
-    setThoughts(thoughts.filter((t) => t.id !== id));
+  const requestPublish = async () => {
+    if (publishing || !siteDraft) return;
+    setPublishing(true);
+    setError("");
+    setPublishNote("");
+    try {
+      const response = await fetch("/.netlify/functions/create-checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          successUrl: `${window.location.origin}/?checkout=success`,
+          cancelUrl: `${window.location.origin}/?checkout=cancelled`,
+        }),
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || "Checkout failed");
+      if (payload.url) {
+        window.location.href = payload.url;
+        return;
+      }
+      setPublishNote("Checkout created, but no URL returned.");
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Could not start checkout");
+    } finally {
+      setPublishing(false);
+    }
   };
 
   if (loading) return <div>Loading...</div>;
 
   if (!user) {
     return (
-      <div>
-        <h1>Spark</h1>
-        <p>Turn thoughts into business ideas.</p>
-        <p style={{ marginTop: "1rem" }}>
+      <main className="auth-shell">
+        <div className="auth-card">
+          <p className="eyebrow">ProfileLauncher</p>
+          <h1>Launch your business site</h1>
+          <p className="muted">Sign in to import your Google Business Profile and generate a live website.</p>
+          <p style={{ marginTop: "1rem" }}>
           <Link to="/login">Sign in</Link> to get started.
-        </p>
-      </div>
+          </p>
+        </div>
+      </main>
     );
   }
 
   return (
-    <div>
-      <header style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "2rem" }}>
-        <h1>Spark</h1>
+    <main className="dashboard-shell">
+      <header className="dash-header">
         <div>
-          <span style={{ marginRight: "1rem" }}>{user.email}</span>
-          <button onClick={signOut} style={{ padding: "0.5rem 1rem" }}>Logout</button>
+          <p className="eyebrow">ProfileLauncher</p>
+          <h1>Build and publish your website</h1>
+        </div>
+        <div>
+          <span className="user-pill">{user.email}</span>
+          <button onClick={signOut}>Logout</button>
         </div>
       </header>
 
-      <form onSubmit={handleSubmit}>
+      <section className="panel">
+        <h2>Step 1: Add your Google Business Profile URL</h2>
+        <p className="muted">Example: <code>https://g.page/r/...</code> or your public Maps profile URL.</p>
+        <form onSubmit={generateDraft}>
         <input
-          type="text"
-          placeholder="Enter a thought or idea..."
-          value={thought}
-          onChange={(event) => setThought(event.target.value)}
+            type="url"
+            placeholder="https://g.page/r/your-business-profile"
+            value={profileUrl}
+            onChange={(event) => setProfileUrl(event.target.value)}
           disabled={generating}
+            required
         />
         <button type="submit" disabled={generating}>
-          {generating ? "Generating..." : "Generate Ideas"}
+            {generating ? "Generating draft..." : "Generate site draft"}
         </button>
-      </form>
-      {error && <p className="error">{error}</p>}
+        </form>
+      </section>
 
-      {thoughts.length > 0 && (
-        <div style={{ marginTop: "2rem" }}>
-          <h2>Your Thoughts</h2>
-          {thoughts.map((item) => (
-            <div key={item.id} style={{ marginBottom: "1.5rem", padding: "1rem", border: "1px solid #ddd", borderRadius: "4px" }}>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <strong>{item.content}</strong>
-                <button onClick={() => handleDelete(item.id)} style={{ padding: "0.25rem 0.5rem", fontSize: "0.8rem" }}>Delete</button>
-              </div>
-              {item.ideas && (
-                <ul style={{ marginTop: "0.5rem", paddingLeft: "1.5rem" }}>
-                  {item.ideas.map((idea, i) => (
-                    <li key={i} style={{ marginBottom: "0.25rem" }}>{idea}</li>
-                  ))}
-                </ul>
-              )}
-            </div>
-          ))}
-        </div>
+      {error && <p className="error">{error}</p>}
+      {publishNote && <p className="note">{publishNote}</p>}
+
+      {siteDraft && (
+        <section className="panel">
+          <h2>Step 2: Review your generated site draft</h2>
+          <div className="draft-grid">
+            <article className="draft-card">
+              <h3>{siteDraft.headline}</h3>
+              <p>{siteDraft.subheadline}</p>
+            </article>
+            <article className="draft-card">
+              <h3>SEO Preview</h3>
+              <p><strong>{siteDraft.seoTitle}</strong></p>
+              <p>{siteDraft.seoDescription}</p>
+            </article>
+          </div>
+          <h3>Planned pages</h3>
+          <ul className="page-list">
+            {siteDraft.pages.map((page) => (
+              <li key={page.slug}>
+                <strong>{page.title}</strong> <code>{page.slug}</code>
+                <p>{page.summary}</p>
+              </li>
+            ))}
+          </ul>
+        </section>
       )}
-    </div>
+
+      <section className="panel">
+        <h2>Step 3: Publish</h2>
+        <p className="muted">Publishing includes hosted deployment and ongoing sync of phone and hours.</p>
+        <button onClick={requestPublish} disabled={!siteDraft || publishing}>
+          {publishing ? "Opening checkout..." : "Publish website"}
+        </button>
+      </section>
+    </main>
   );
 };
