@@ -3,6 +3,13 @@ import { User, Session, AuthError } from "@supabase/supabase-js";
 import { supabase } from "./supabase";
 
 const APP_ID = import.meta.env.VITE_APP_ID;
+const PROD_APP_URL = "https://profile-launcher-app.netlify.app";
+
+const getRedirectUrl = (): string => {
+  if (typeof window === "undefined") return PROD_APP_URL;
+  const origin = window.location.origin;
+  return origin.includes("localhost") ? PROD_APP_URL : origin;
+};
 
 type AuthContextType = {
   user: User | null;
@@ -53,7 +60,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       email,
       options: {
         data: { app_id: APP_ID },
-        emailRedirectTo: window.location.origin,
+        emailRedirectTo: getRedirectUrl(),
       }
     });
     return { error };
@@ -63,7 +70,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: getRedirectUrl(),
         queryParams: {
           access_type: "offline",
           prompt: "consent",
