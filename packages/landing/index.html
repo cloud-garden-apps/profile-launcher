@@ -3,15 +3,15 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>ProfileLauncher | Launch Your Business Website In Minutes</title>
+    <title>ProfileLauncher | Turn Your GBP Into a Website</title>
     <meta
       name="description"
-      content="Turn your Google Business Profile into a polished website in minutes. Connect, preview, and publish with ProfileLauncher."
+      content="Turn your Google Business Profile into a stunning website. Connect, customize, and launch in minutes."
     />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Fraunces:opsz,wght@9..144,500;9..144,600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <script src="https://cdn.tailwindcss.com"></script>
@@ -21,233 +21,128 @@
           extend: {
             fontFamily: {
               sans: ["Plus Jakarta Sans", "ui-sans-serif", "system-ui", "sans-serif"],
-              display: ["Fraunces", "ui-serif", "Georgia", "serif"],
             },
             colors: {
-              shell: "#f5f8f7",
-              ink: "#10222a",
-              muted: "#4f6570",
-              mint: "#0f766e",
-              mintSoft: "#d5f5ef",
-              line: "#dbe7e5",
+              shell: "#f3f6f5",
+              ink: "#1a2a33",
+              muted: "#546872",
+              mint: "#16a085",
+              mintDark: "#0f7f69",
+              line: "#d8e4e2",
             },
             boxShadow: {
-              soft: "0 18px 48px rgba(16, 34, 42, 0.12)",
-              panel: "0 1px 0 rgba(255,255,255,0.7) inset, 0 16px 30px rgba(16,34,42,0.12)",
+              card: "0 12px 35px rgba(23, 45, 53, 0.12)",
+              soft: "0 8px 22px rgba(23, 45, 53, 0.09)",
             },
           },
         },
       };
     </script>
     <style>
-      :root {
-        color-scheme: light;
+      body {
+        background: radial-gradient(circle at 58% 18%, rgba(71, 207, 170, 0.18), transparent 35%), #f3f6f5;
       }
 
-      .hero-bg {
-        background-image:
-          linear-gradient(180deg, rgba(245, 248, 247, 0.45) 0%, rgba(245, 248, 247, 0.96) 68%),
-          url('https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=2400&q=80');
+      .hero-preview {
+        background-image: linear-gradient(140deg, rgba(0, 0, 0, 0.18), rgba(0, 0, 0, 0.42)),
+          url('https://images.unsplash.com/photo-1517821099601-9a7f2f52795f?auto=format&fit=crop&w=1400&q=80');
         background-size: cover;
         background-position: center;
       }
-
-      .texture::before {
-        content: "";
-        position: absolute;
-        inset: 0;
-        pointer-events: none;
-        background-image: radial-gradient(rgba(16, 34, 42, 0.13) 0.5px, transparent 0.5px);
-        background-size: 3px 3px;
-        opacity: 0.24;
-      }
-
-      .glow {
-        background: radial-gradient(circle at 20% 20%, rgba(15, 118, 110, 0.28), transparent 50%),
-          radial-gradient(circle at 80% 75%, rgba(59, 130, 246, 0.18), transparent 50%);
-      }
     </style>
   </head>
-  <body class="bg-shell text-ink antialiased">
-    <main class="hero-bg texture relative min-h-[95vh] overflow-hidden">
-      <div class="glow absolute inset-0"></div>
-      <div class="relative mx-auto flex min-h-[95vh] max-w-6xl flex-col px-5 pb-12 pt-6 sm:px-8 sm:pt-8">
-        <header class="rounded-2xl border border-white/70 bg-white/70 px-4 py-3 shadow-soft backdrop-blur md:px-6">
-          <div class="flex items-center justify-between gap-4">
-            <a href="#" class="text-sm font-extrabold tracking-wide sm:text-base">ProfileLauncher</a>
-            <nav class="hidden items-center gap-8 text-sm text-muted md:flex">
-              <a href="#how" class="transition hover:text-ink">How It Works</a>
-              <a href="#proof" class="transition hover:text-ink">Customer Proof</a>
-              <a href="#faq" class="transition hover:text-ink">FAQ</a>
-            </nav>
-            <a
-              href="https://profile-launcher-app.netlify.app"
-              class="rounded-xl border border-ink/20 bg-white px-4 py-2 text-sm font-bold transition hover:bg-mintSoft"
-            >
-              Open App
-            </a>
-          </div>
-        </header>
-
-        <section class="my-auto pt-14 sm:pt-20">
-          <div class="max-w-4xl">
-            <p class="mb-5 inline-flex rounded-full border border-mint/30 bg-mintSoft px-4 py-1 text-xs font-bold uppercase tracking-[0.18em] text-mint">
-              Website launch for local businesses
-            </p>
-            <h1 class="font-display text-4xl leading-tight sm:text-5xl lg:text-6xl">
-              Turn Your Google Business Profile Into a Stunning Website.
-            </h1>
-            <p class="mt-5 max-w-2xl text-base leading-relaxed text-muted sm:text-lg">
-              Connect, preview, and publish in minutes.
-            </p>
-
-            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
-              <a
-                href="https://profile-launcher-app.netlify.app"
-                class="rounded-xl bg-mint px-6 py-3 text-center text-sm font-extrabold text-white shadow-soft transition hover:bg-[#0a5f59]"
-              >
-                Start Free
-              </a>
-              <a
-                href="#how"
-                class="rounded-xl border border-ink/20 bg-white/75 px-6 py-3 text-center text-sm font-bold transition hover:bg-white"
-              >
-                See How It Works
-              </a>
-            </div>
-          </div>
-
-          <div class="mt-10 grid gap-4 sm:grid-cols-3">
-            <article class="rounded-2xl border border-white/80 bg-white/80 p-4 shadow-panel backdrop-blur">
-              <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">Fast Setup</p>
-              <p class="mt-1 text-sm text-muted">From connect to preview in one session.</p>
-            </article>
-            <article class="rounded-2xl border border-white/80 bg-white/80 p-4 shadow-panel backdrop-blur">
-              <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">Clear Control</p>
-              <p class="mt-1 text-sm text-muted">You review before anything is published.</p>
-            </article>
-            <article class="rounded-2xl border border-white/80 bg-white/80 p-4 shadow-panel backdrop-blur">
-              <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">No Design Team Needed</p>
-              <p class="mt-1 text-sm text-muted">Built for owners who need momentum now.</p>
-            </article>
-          </div>
-        </section>
-      </div>
-    </main>
-
-    <section id="how" class="border-t border-line bg-white px-5 py-16 sm:px-8 sm:py-20">
-      <div class="mx-auto max-w-6xl">
-        <div class="max-w-2xl">
-          <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">Simplicity Wins</p>
-          <h2 class="mt-2 font-display text-3xl sm:text-4xl">A Straightforward Flow That Reduces Decision Fatigue</h2>
-        </div>
-        <div class="mt-10 grid gap-4 md:grid-cols-3">
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-extrabold text-mint">Step 01</p>
-            <h3 class="mt-2 text-lg font-bold">Connect Google</h3>
-            <p class="mt-2 text-sm text-muted">Authenticate once, then choose the location you want to work on.</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-extrabold text-mint">Step 02</p>
-            <h3 class="mt-2 text-lg font-bold">Generate Preview</h3>
-            <p class="mt-2 text-sm text-muted">Instantly create a site draft with structure, copy, and a visual preview.</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-extrabold text-mint">Step 03</p>
-            <h3 class="mt-2 text-lg font-bold">Publish Confidently</h3>
-            <p class="mt-2 text-sm text-muted">Review first, then launch when you’re ready. No pressure to go live early.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="why" class="border-t border-line bg-shell px-5 py-16 sm:px-8 sm:py-20">
-      <div class="mx-auto grid max-w-6xl gap-8 lg:grid-cols-2">
-        <div>
-          <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">Why It Converts</p>
-          <h2 class="mt-2 font-display text-3xl sm:text-4xl">Built To Reduce Risk, Not Add More Tools To Manage</h2>
-          <p class="mt-4 text-sm leading-relaxed text-muted sm:text-base">
-            Strong conversion comes from clear expectations, simple flow, and visible control at each step.
-          </p>
-        </div>
-        <div class="grid gap-4">
-          <article class="rounded-2xl border border-line bg-white p-5">
-            <h3 class="text-base font-bold">Control</h3>
-            <p class="mt-1 text-sm text-muted">You decide when to connect, regenerate, and publish.</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-white p-5">
-            <h3 class="text-base font-bold">Clarity</h3>
-            <p class="mt-1 text-sm text-muted">The interface explains each stage and what happens next.</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-white p-5">
-            <h3 class="text-base font-bold">Proof</h3>
-            <p class="mt-1 text-sm text-muted">Preview before payment and before launch to avoid surprises.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="proof" class="border-t border-line bg-white px-5 py-16 sm:px-8 sm:py-20">
-      <div class="mx-auto max-w-6xl">
-        <div class="flex flex-wrap items-end justify-between gap-6">
-          <div>
-            <p class="text-xs font-bold uppercase tracking-[0.16em] text-mint">Social + Outcome</p>
-            <h2 class="mt-2 font-display text-3xl sm:text-4xl">Made For Real Local Service Businesses</h2>
-          </div>
-          <a
-            href="https://profile-launcher-app.netlify.app"
-            class="rounded-xl bg-mint px-5 py-3 text-sm font-extrabold text-white transition hover:bg-[#0a5f59]"
-          >
-            Try ProfileLauncher
-          </a>
-        </div>
-
-        <div class="mt-8 grid gap-4 md:grid-cols-3">
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-bold">"We needed a site fast and finally had one we could show clients."</p>
-            <p class="mt-3 text-xs text-muted">Early beta user · Home services</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-bold">"The preview step made it easy to trust before publishing."</p>
-            <p class="mt-3 text-xs text-muted">Early beta user · Local retail</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-shell p-6">
-            <p class="text-sm font-bold">"Simple enough to use without a designer or developer."</p>
-            <p class="mt-3 text-xs text-muted">Early beta user · Solo operator</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <section id="faq" class="border-t border-line bg-shell px-5 py-16 sm:px-8 sm:py-20">
-      <div class="mx-auto max-w-4xl">
-        <h2 class="font-display text-3xl sm:text-4xl">Questions Before You Start</h2>
-        <div class="mt-8 space-y-4">
-          <article class="rounded-2xl border border-line bg-white p-5">
-            <h3 class="text-base font-bold">Do I need a logo first?</h3>
-            <p class="mt-1 text-sm text-muted">No. Start with text branding now and add your logo later.</p>
-          </article>
-          <article class="rounded-2xl border border-line bg-white p-5">
-            <h3 class="text-base font-bold">Will anything publish automatically?</h3>
-            <p class="mt-1 text-sm text-muted">No. You generate and review first, then publish when you choose.</p>
-          </article>
-        </div>
-      </div>
-    </section>
-
-    <footer class="border-t border-line bg-shell px-5 py-10 sm:px-8">
-      <div class="mx-auto flex max-w-6xl flex-col items-start justify-between gap-4 sm:flex-row sm:items-center">
-        <div>
-          <p class="text-sm font-extrabold">ProfileLauncher</p>
-          <p class="mt-1 text-sm text-muted">From Google Business Profile to live website, fast.</p>
-        </div>
+  <body class="font-sans text-ink antialiased">
+    <main class="mx-auto max-w-6xl px-5 pb-14 pt-6 sm:px-8 sm:pt-8">
+      <header class="flex items-center justify-between">
+        <a href="#" class="text-xl font-extrabold tracking-tight">ProfileLauncher</a>
+        <nav class="hidden items-center gap-8 text-sm font-medium text-muted md:flex">
+          <a href="#how" class="hover:text-ink">How it works</a>
+          <a href="#domains" class="hover:text-ink">Custom Domains</a>
+        </nav>
         <a
           href="https://profile-launcher-app.netlify.app"
-          class="rounded-xl border border-ink/20 bg-white px-4 py-2 text-sm font-bold transition hover:bg-mintSoft"
+          class="rounded-lg bg-ink px-4 py-2 text-sm font-bold text-white transition hover:bg-[#121e25]"
         >
           Open App
         </a>
+      </header>
+
+      <section class="mt-12 grid items-center gap-8 lg:grid-cols-[1fr_1.2fr]">
+        <div>
+          <h1 class="max-w-xl text-4xl font-bold leading-tight sm:text-5xl">
+            Turn your Google Business Profile into a <span class="text-[#0f8d75]">Stunning Website</span>
+          </h1>
+          <p class="mt-4 max-w-lg text-lg text-muted">Connect, customize, and launch in minutes.</p>
+
+          <div class="mt-7 flex flex-col items-start gap-3 sm:flex-row sm:items-center">
+            <a
+              href="https://profile-launcher-app.netlify.app"
+              class="rounded-lg bg-mint px-6 py-3 text-sm font-extrabold text-white shadow-soft transition hover:bg-mintDark"
+            >
+              Open App
+            </a>
+            <p class="text-sm text-muted">No code required. You approve before publish.</p>
+          </div>
+        </div>
+
+        <div class="relative">
+          <div class="absolute -left-4 top-8 z-20 w-40 rounded-2xl border border-line bg-white p-4 shadow-card sm:-left-7 sm:w-48">
+            <div class="flex items-start justify-between">
+              <p class="text-sm font-bold">Google Business</p>
+              <span class="rounded-md bg-[#eef5ff] px-2 py-0.5 text-[10px] font-bold text-[#2d5ccc]">LIVE</span>
+            </div>
+            <p class="mt-2 text-sm font-semibold">Sample Plumbing Co.</p>
+            <p class="mt-1 text-xs text-muted">4.9 ★ (128 reviews)</p>
+            <p class="mt-2 text-xs text-muted">Open · Closes 6pm</p>
+            <p class="mt-2 text-xs text-muted">(555) 123-2291</p>
+          </div>
+
+          <div class="hero-preview h-[250px] rounded-2xl border border-white/80 shadow-card sm:h-[300px]"></div>
+        </div>
+      </section>
+    </main>
+
+    <section id="how" class="border-y border-line bg-white px-5 py-14 sm:px-8">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="text-3xl font-semibold">Connect. Customize. Launch.</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          <article class="rounded-2xl border border-line bg-shell p-6">
+            <p class="text-sm font-extrabold text-mint">01</p>
+            <h3 class="mt-2 text-lg font-bold">Connect Profile</h3>
+            <p class="mt-2 text-sm text-muted">Securely link your Google Business Profile account.</p>
+          </article>
+          <article class="rounded-2xl border border-line bg-shell p-6">
+            <p class="text-sm font-extrabold text-mint">02</p>
+            <h3 class="mt-2 text-lg font-bold">Customize Draft</h3>
+            <p class="mt-2 text-sm text-muted">Generate your site, review content, and edit before publish.</p>
+          </article>
+          <article class="rounded-2xl border border-line bg-shell p-6">
+            <p class="text-sm font-extrabold text-mint">03</p>
+            <h3 class="mt-2 text-lg font-bold">Launch</h3>
+            <p class="mt-2 text-sm text-muted">Publish a professional website without waiting on a dev team.</p>
+          </article>
+        </div>
       </div>
-    </footer>
+    </section>
+
+    <section id="domains" class="px-5 py-14 sm:px-8">
+      <div class="mx-auto max-w-6xl rounded-3xl border border-line bg-white p-8 shadow-soft">
+        <div class="grid gap-6 lg:grid-cols-[1fr_auto] lg:items-end">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-[0.14em] text-mint">Roadmap</p>
+            <h2 class="mt-2 text-3xl font-semibold">Custom domains and stronger brand controls are next.</h2>
+            <p class="mt-3 max-w-2xl text-sm text-muted">
+              Start with the fast launch workflow now. Bring your logo and custom domain when you are ready.
+            </p>
+          </div>
+          <a
+            href="https://profile-launcher-app.netlify.app"
+            class="inline-flex h-fit rounded-lg bg-ink px-5 py-3 text-sm font-bold text-white transition hover:bg-[#121e25]"
+          >
+            Start in App
+          </a>
+        </div>
+      </div>
+    </section>
   </body>
 </html>

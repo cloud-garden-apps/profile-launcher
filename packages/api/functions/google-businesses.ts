@@ -26,6 +26,28 @@ type BusinessOption = {
   address: string | null;
 };
 
+const isMockModeEnabled = (): boolean =>
+  ["1", "true", "yes", "on"].includes((process.env.GOOGLE_BUSINESS_MOCK_MODE || "").toLowerCase());
+
+const getMockBusinesses = (): BusinessOption[] => [
+  {
+    id: "accounts/mock-account/locations/mock-location-1",
+    name: "Oak & Pine Plumbing",
+    accountName: "accounts/mock-account",
+    websiteUri: "https://oakandpineplumbing.com",
+    phone: "+1 415-555-1200",
+    address: "1200 Market Street, San Francisco, CA 94103, US",
+  },
+  {
+    id: "accounts/mock-account/locations/mock-location-2",
+    name: "Maple Dental Studio",
+    accountName: "accounts/mock-account",
+    websiteUri: "https://mapledentalstudio.com",
+    phone: "+1 415-555-8800",
+    address: "250 King Street, San Francisco, CA 94107, US",
+  },
+];
+
 const readConnection = async (supabaseUrl: string, serviceKey: string, userId: string, appId: string): Promise<ConnectionRow | null> => {
   const endpoint = new URL(`${supabaseUrl}/rest/v1/google_business_connections`);
   endpoint.searchParams.set("select", "refresh_token_ciphertext,refresh_token_iv,refresh_token_tag");
@@ -172,6 +194,11 @@ export default async (request: Request, _context: Context) => {
 
     const user = await requireUser(request);
     const appId = getAppId();
+
+    if (isMockModeEnabled()) {
+      return json({ connected: true, mockMode: true, appId, userId: user.id, businesses: getMockBusinesses() });
+    }
+
     const connection = await readConnection(supabaseUrl, serviceKey, user.id, appId);
 
     if (!connection) {

@@ -15,6 +15,13 @@
   - business dropdown in Step 1
   - draft generation from selected business
 - Fallback URL flow remains available for demo preview generation when GBP APIs are blocked.
+- Added MVP execution checklist:
+  - `MVP_CHECKLIST.md`
+- Added billing foundation (code complete, needs config/migration):
+  - `packages/api/functions/billing-status.ts`
+  - `packages/api/functions/stripe-webhook.ts`
+  - checkout metadata in `packages/api/functions/create-checkout.ts`
+  - DB migration: `supabase/migrations/003_billing_subscriptions.sql`
 
 ## Current blocker
 

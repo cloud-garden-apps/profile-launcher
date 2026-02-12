@@ -60,6 +60,10 @@ export const Dashboard = () => {
   const [loadingBusinesses, setLoadingBusinesses] = useState(false);
   const [businesses, setBusinesses] = useState<GoogleBusiness[]>([]);
   const [selectedBusinessId, setSelectedBusinessId] = useState("");
+  const [loadingBilling, setLoadingBilling] = useState(false);
+  const [billingTier, setBillingTier] = useState("free");
+  const [billingStatus, setBillingStatus] = useState("inactive");
+  const [canPublishByPlan, setCanPublishByPlan] = useState(false);
 
   const canGenerateFromFallback = useMemo(() => {
     if (!profileUrl.trim()) return false;
@@ -149,24 +153,62 @@ export const Dashboard = () => {
     }
   };
 
+  const loadBillingStatus = async () => {
+    if (!user) return;
+    setLoadingBilling(true);
+    try {
+      const token = await getAccessToken();
+      const response = await fetch(API_ROUTES.billingStatus, {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const payload = await response.json();
+      if (!response.ok) throw new Error(payload.error || t("dashboard.errBillingStatus"));
+      setBillingTier(payload.tier || "free");
+      setBillingStatus(payload.status || "inactive");
+      setCanPublishByPlan(Boolean(payload.canPublish));
+    } catch {
+      setBillingTier("free");
+      setBillingStatus("inactive");
+      setCanPublishByPlan(false);
+    } finally {
+      setLoadingBilling(false);
+    }
+  };
+
   useEffect(() => {
     if (!user) return;
     loadGoogleConnectionStatus().catch(() => undefined);
+    loadBillingStatus().catch(() => undefined);
   }, [user]);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     const googleStatus = params.get("google");
-    if (!googleStatus) return;
+    const checkoutStatus = params.get("checkout");
 
-    if (googleStatus === "connected") {
-      setPublishNote(t("dashboard.noteGoogleConnected"));
-      loadGoogleConnectionStatus().catch(() => undefined);
-    } else {
-      setError(`Google connection failed (${googleStatus}).`);
+    if (googleStatus) {
+      if (googleStatus === "connected") {
+        setPublishNote(t("dashboard.noteGoogleConnected"));
+        loadGoogleConnectionStatus().catch(() => undefined);
+      } else {
+        setError(`Google connection failed (${googleStatus}).`);
+      }
+    }
+
+    if (checkoutStatus) {
+      if (checkoutStatus === "success") {
+        setPublishNote(t("dashboard.noteCheckoutSuccess"));
+        loadBillingStatus().catch(() => undefined);
+      } else if (checkoutStatus === "cancelled") {
+        setPublishNote(t("dashboard.noteCheckoutCancelled"));
+      }
     }
 
     params.delete("google");
+    params.delete("checkout");
     const nextUrl = `${window.location.pathname}${params.toString() ? `?${params.toString()}` : ""}`;
     window.history.replaceState({}, "", nextUrl);
   }, []);
@@ -237,9 +279,13 @@ export const Dashboard = () => {
     setError("");
     setPublishNote("");
     try {
+      const token = await getAccessToken();
       const response = await fetch(API_ROUTES.createCheckout, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({
           successUrl: `${window.location.origin}/?checkout=success`,
           cancelUrl: `${window.location.origin}/?checkout=cancelled`,
@@ -418,12 +464,26 @@ export const Dashboard = () => {
       <section className="panel">
         <h2>{t("dashboard.publishStepTitle")}</h2>
         <p className="muted">{t("dashboard.publishBody")}</p>
-        <button onClick={requestPublish} disabled={!siteDraft || publishing || !googleConnected}>
-          {publishing ? t("dashboard.openingCheckout") : t("dashboard.publishButton")}
+        <p className="muted" style={{ marginBottom: "0.5rem" }}>
+          {loadingBilling
+            ? t("dashboard.billingChecking")
+            : t("dashboard.billingState", { tier: billingTier, status: billingStatus })}
+        </p>
+        <button onClick={requestPublish} disabled={!siteDraft || publishing || !googleConnected || canPublishByPlan}>
+          {publishing
+            ? t("dashboard.openingCheckout")
+            : canPublishByPlan
+              ? t("dashboard.publishUnlocked")
+              : t("dashboard.publishButton")}
         </button>
         {!googleConnected && (
           <p className="warning" style={{ marginTop: "0.8rem" }}>
             {t("dashboard.publishRequiresConnection")}
+          </p>
+        )}
+        {!canPublishByPlan && (
+          <p className="warning" style={{ marginTop: "0.8rem" }}>
+            {t("dashboard.publishRequiresPlan")}
           </p>
         )}
       </section>
