@@ -38,6 +38,12 @@ Effect:
 - business dropdown shows no locations
 - preview from real GBP data is blocked until Google approves access
 
+## Additional blocker (2026-02-12)
+
+- Supabase project (`heqyrlxixapvoskjpjvx`) currently unhealthy during US-region incident.
+- Query path returns `544` timeout even for `select 1`.
+- Billing migration `003_billing_subscriptions.sql` and Stripe webhook verification are pending until health recovers.
+
 ## What user already submitted
 
 - GBP API contact form submitted (basic API access path) from Google support flow.

@@ -56,3 +56,8 @@ A buyable v1 where a small business owner can connect GBP, generate a convincing
 
 ## Current external blocker
 Google Business Profile API allowlist/quota for project `136566290599` still appears blocked (RPM = 0 in previous checks), preventing real location fetch in production.
+
+## Current platform blocker (2026-02-12)
+- Supabase project `heqyrlxixapvoskjpjvx` is in unhealthy state during US-region incident (`Elevated 500 Errors in Some US Regions`).
+- SQL query path times out with `544 Connection terminated due to connection timeout` (even `select 1`).
+- Billing migration + webhook verification are pending until Supabase health returns to normal.
