@@ -1,128 +1,192 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>ProfileLauncher | Turn Your Google Profile Into a Website</title>
-  <meta name="description" content="ProfileLauncher creates a professional website from your Google Business Profile and keeps key details in sync." />
-  <style>
-    :root {
-      --bg: #f2f5f8;
-      --ink: #0f1720;
-      --muted: #4a5a68;
-      --accent: #166534;
-      --accent-dark: #14532d;
-      --card: #ffffff;
-      --border: #d6e2ec;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ProfileLauncher | Website Launches From Your GBP</title>
+    <meta
+      name="description"
+      content="ProfileLauncher turns your Google Business Profile into a polished website you can launch in minutes."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&family=Sora:wght@500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              sans: ["Manrope", "ui-sans-serif", "system-ui", "sans-serif"],
+              display: ["Sora", "ui-sans-serif", "system-ui", "sans-serif"],
+            },
+            colors: {
+              ink: "#EAF2F2",
+              mist: "#AFBEC0",
+              panel: "#0A1B22",
+              signal: "#44D1B6",
+              signalDark: "#16957C",
+            },
+            boxShadow: {
+              glow: "0 0 0 1px rgba(137, 170, 176, 0.35), 0 30px 80px rgba(0, 0, 0, 0.45)",
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      .hero-image {
+        background-image:
+          linear-gradient(180deg, rgba(2, 12, 16, 0.55) 0%, rgba(2, 12, 16, 0.84) 75%),
+          url('https://images.unsplash.com/photo-1517821099601-9a7f2f52795f?auto=format&fit=crop&w=2200&q=80');
+        background-size: cover;
+        background-position: center;
+      }
 
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      font-family: "Avenir Next", "Avenir", "Segoe UI", sans-serif;
-      color: var(--ink);
-      background: radial-gradient(circle at top right, #d7f2e1, var(--bg) 35%);
-      line-height: 1.5;
-    }
-    .wrap {
-      max-width: 980px;
-      margin: 0 auto;
-      padding: 3rem 1.25rem 4rem;
-    }
-    .hero {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 20px;
-      padding: 2rem;
-      box-shadow: 0 10px 30px rgba(15, 23, 32, 0.08);
-    }
-    .badge {
-      display: inline-block;
-      font-size: 0.8rem;
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-      color: #0f5132;
-      background: #d1fae5;
-      border-radius: 999px;
-      padding: 0.35rem 0.65rem;
-      margin-bottom: 1rem;
-    }
-    h1 {
-      margin: 0;
-      font-size: clamp(2rem, 5vw, 3.3rem);
-      line-height: 1.05;
-    }
-    .sub {
-      margin: 1rem 0 0;
-      color: var(--muted);
-      max-width: 52ch;
-      font-size: 1.1rem;
-    }
-    .cta {
-      margin-top: 1.5rem;
-      display: inline-block;
-      background: var(--accent);
-      color: #fff;
-      text-decoration: none;
-      border-radius: 10px;
-      padding: 0.85rem 1.15rem;
-      font-weight: 600;
-    }
-    .cta:hover { background: var(--accent-dark); }
-    .grid {
-      margin-top: 1.5rem;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
-      gap: 0.85rem;
-    }
-    .card {
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 1rem;
-    }
-    .card h3 {
-      margin-top: 0;
-      margin-bottom: 0.35rem;
-      font-size: 1rem;
-    }
-    .card p {
-      margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    .foot {
-      margin-top: 1rem;
-      color: #617280;
-      font-size: 0.88rem;
-    }
-  </style>
-</head>
-<body>
-  <main class="wrap">
-    <section class="hero">
-      <span class="badge">ProfileLauncher Beta</span>
-      <h1>Your Google Business Profile deserves a real website.</h1>
-      <p class="sub">
-        ProfileLauncher turns your profile into a polished website, then keeps key fields in sync so your business info stays current.
-      </p>
-      <a class="cta" href="https://profile-launcher-app.netlify.app">Open The App</a>
-      <div class="grid">
-        <div class="card">
-          <h3>1. Connect profile</h3>
-          <p>Paste your Google Business Profile URL to import business details.</p>
-        </div>
-        <div class="card">
-          <h3>2. Generate website</h3>
-          <p>Create a homepage, services, about, reviews, and contact draft in minutes.</p>
-        </div>
-        <div class="card">
-          <h3>3. Publish confidently</h3>
-          <p>Launch with local SEO basics and managed sync for hours and phone.</p>
+      .grain-overlay::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.15;
+        pointer-events: none;
+        background-image: radial-gradient(rgba(255, 255, 255, 0.35) 0.45px, transparent 0.45px);
+        background-size: 3px 3px;
+      }
+    </style>
+  </head>
+  <body class="bg-[#061219] text-ink">
+    <main class="min-h-screen hero-image grain-overlay relative overflow-hidden">
+      <div class="mx-auto max-w-6xl px-5 pb-12 pt-6 sm:px-8 sm:pt-8">
+        <header class="rounded-2xl border border-white/20 bg-white/5 px-4 py-3 backdrop-blur md:px-6">
+          <div class="flex items-center justify-between gap-4">
+            <a href="#" class="font-display text-sm font-semibold tracking-wide text-ink sm:text-base">ProfileLauncher</a>
+            <nav class="hidden items-center gap-8 text-sm text-mist md:flex">
+              <a href="#how" class="transition hover:text-white">How It Works</a>
+              <a href="#benefits" class="transition hover:text-white">Benefits</a>
+              <a href="#faq" class="transition hover:text-white">FAQ</a>
+            </nav>
+            <a
+              href="https://profile-launcher-app.netlify.app"
+              class="rounded-xl border border-white/35 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/10"
+            >
+              Open App
+            </a>
+          </div>
+        </header>
+
+        <section class="pt-16 sm:pt-24 lg:pt-28">
+          <div class="max-w-3xl">
+            <p class="mb-4 inline-flex rounded-full border border-signal/60 bg-signal/15 px-4 py-1 text-xs font-bold uppercase tracking-[0.18em] text-signal">
+              GBP to Website
+            </p>
+            <h1 class="font-display text-4xl font-semibold leading-tight text-white sm:text-5xl lg:text-6xl">
+              Turn Your Google Business Profile Into A Website That Actually Converts.
+            </h1>
+            <p class="mt-6 max-w-2xl text-base text-mist sm:text-lg">
+              Connect your profile, pick your location, and launch a polished site draft in minutes. Built for local businesses that need speed without looking generic.
+            </p>
+
+            <div class="mt-8 flex flex-col gap-3 sm:flex-row">
+              <a
+                href="https://profile-launcher-app.netlify.app"
+                class="rounded-xl bg-signal px-6 py-3 text-center text-sm font-bold text-[#032018] transition hover:bg-[#5EE8CC]"
+              >
+                Start Free In The App
+              </a>
+              <a
+                href="#how"
+                class="rounded-xl border border-white/30 bg-white/5 px-6 py-3 text-center text-sm font-bold text-white transition hover:bg-white/10"
+              >
+                See How It Works
+              </a>
+            </div>
+          </div>
+
+          <div class="mt-12 grid gap-4 sm:grid-cols-3">
+            <article class="rounded-2xl border border-white/20 bg-panel/75 p-5 shadow-glow">
+              <p class="text-2xl font-extrabold text-white">1</p>
+              <p class="mt-2 text-sm text-mist">Connect Google</p>
+              <p class="mt-1 text-sm text-ink">OAuth-based connection to your Google Business Profile account.</p>
+            </article>
+            <article class="rounded-2xl border border-white/20 bg-panel/75 p-5 shadow-glow">
+              <p class="text-2xl font-extrabold text-white">2</p>
+              <p class="mt-2 text-sm text-mist">Generate Draft</p>
+              <p class="mt-1 text-sm text-ink">Create homepage, services, contact and review-ready messaging fast.</p>
+            </article>
+            <article class="rounded-2xl border border-white/20 bg-panel/75 p-5 shadow-glow">
+              <p class="text-2xl font-extrabold text-white">3</p>
+              <p class="mt-2 text-sm text-mist">Publish</p>
+              <p class="mt-1 text-sm text-ink">Launch quickly with a clean domain setup and room to grow later.</p>
+            </article>
+          </div>
+        </section>
+      </div>
+    </main>
+
+    <section id="how" class="bg-[#071822] px-5 py-14 sm:px-8 sm:py-20">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">How ProfileLauncher Works</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-3">
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="text-lg font-bold text-white">Connect</h3>
+            <p class="mt-2 text-sm text-mist">Sign in and connect your Google account. Pick the business location you want to launch.</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="text-lg font-bold text-white">Preview</h3>
+            <p class="mt-2 text-sm text-mist">Generate a visual draft and tune messaging before anything goes live.</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="text-lg font-bold text-white">Ship</h3>
+            <p class="mt-2 text-sm text-mist">Publish when ready and keep your key business info aligned as your profile evolves.</p>
+          </div>
         </div>
       </div>
-      <p class="foot">For now, subdomain hosting is included. Custom domains are planned next.</p>
     </section>
-  </main>
-</body>
+
+    <section id="benefits" class="bg-[#051117] px-5 py-14 sm:px-8 sm:py-20">
+      <div class="mx-auto max-w-6xl">
+        <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">Built For Local Business Speed</h2>
+        <div class="mt-8 grid gap-4 md:grid-cols-2">
+          <div class="rounded-2xl border border-signal/30 bg-signal/10 p-6">
+            <p class="text-sm font-bold uppercase tracking-[0.16em] text-signal">Fast Launch</p>
+            <p class="mt-2 text-sm text-ink">From profile connection to publish-ready draft in one session.</p>
+          </div>
+          <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+            <p class="text-sm font-bold uppercase tracking-[0.16em] text-white">Simple Stack</p>
+            <p class="mt-2 text-sm text-mist">No logo required. No design team required. You can refine brand later.</p>
+          </div>
+        </div>
+
+        <div class="mt-10 rounded-2xl border border-white/20 bg-white/5 p-6 sm:p-8">
+          <h3 class="font-display text-2xl font-semibold text-white">Ready To Launch Your Site?</h3>
+          <p class="mt-2 text-sm text-mist">Start with your existing Google Business Profile and ship a better web presence tonight.</p>
+          <a
+            href="https://profile-launcher-app.netlify.app"
+            class="mt-5 inline-flex rounded-xl bg-signal px-5 py-3 text-sm font-bold text-[#032018] transition hover:bg-[#5EE8CC]"
+          >
+            Open ProfileLauncher
+          </a>
+        </div>
+      </div>
+    </section>
+
+    <section id="faq" class="bg-[#071822] px-5 py-14 sm:px-8 sm:py-20">
+      <div class="mx-auto max-w-4xl">
+        <h2 class="font-display text-3xl font-semibold text-white sm:text-4xl">FAQ</h2>
+        <div class="mt-8 space-y-4">
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="text-base font-bold text-white">Do I need a logo first?</h3>
+            <p class="mt-2 text-sm text-mist">No. Start with text branding now. Add logo and custom brand assets later.</p>
+          </article>
+          <article class="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <h3 class="text-base font-bold text-white">Can I update content after launch?</h3>
+            <p class="mt-2 text-sm text-mist">Yes. You can regenerate, edit, and refine before and after publish.</p>
+          </article>
+        </div>
+      </div>
+    </section>
+  </body>
 </html>
