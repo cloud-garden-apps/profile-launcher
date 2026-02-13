@@ -1,5 +1,6 @@
 import type { Context } from "@netlify/functions";
 import { corsHeaders, getAppId, handleCors, json, jsonError, requireUser } from "./auth-utils";
+import { inferStripeModeFromSecretKey, normalizeStripeMode } from "./constants";
 
 type SubscriptionRow = {
   tier?: string;
@@ -22,6 +23,13 @@ export default async (request: Request, _context: Context) => {
       return jsonError("Missing SUPABASE_URL or SUPABASE_SECRET_KEY", 500);
     }
 
+    const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
+    const configuredStripeMode = normalizeStripeMode(process.env.STRIPE_MODE);
+    const inferredStripeMode = inferStripeModeFromSecretKey(stripeSecretKey);
+    const stripeMode = configuredStripeMode || inferredStripeMode || "unknown";
+    const stripeModeMismatch =
+      Boolean(configuredStripeMode) && Boolean(inferredStripeMode) && configuredStripeMode !== inferredStripeMode;
+
     const user = await requireUser(request);
     const appId = getAppId();
 
@@ -41,7 +49,14 @@ export default async (request: Request, _context: Context) => {
     if (!response.ok) {
       const errorText = await response.text();
       if (errorText.includes("app_subscriptions") && errorText.includes("does not exist")) {
-        return json({ tier: "free", status: "inactive", canPublish: false, migrationRequired: true });
+        return json({
+          tier: "free",
+          status: "inactive",
+          canPublish: false,
+          migrationRequired: true,
+          stripeMode,
+          stripeModeMismatch,
+        });
       }
       return jsonError("Failed to load billing status", 500);
     }
@@ -50,7 +65,7 @@ export default async (request: Request, _context: Context) => {
     const row = rows[0];
 
     if (!row) {
-      return json({ tier: "free", status: "inactive", canPublish: false });
+      return json({ tier: "free", status: "inactive", canPublish: false, stripeMode, stripeModeMismatch });
     }
 
     const tier = row.tier || "free";
@@ -62,6 +77,8 @@ export default async (request: Request, _context: Context) => {
       status,
       canPublish,
       updatedAt: row.updated_at || null,
+      stripeMode,
+      stripeModeMismatch,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to load billing status";

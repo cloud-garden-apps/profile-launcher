@@ -23,6 +23,8 @@ type GoogleBusiness = {
   address: string | null;
 };
 
+const DEFAULT_TEST_FALLBACK_URL = "https://g.page/r/profilelauncher-test";
+
 const mockDraft = (profileUrl: string): SiteDraft => {
   const parsed = new URL(profileUrl);
   const hostname = parsed.hostname.replace("www.", "");
@@ -64,6 +66,8 @@ export const Dashboard = () => {
   const [billingTier, setBillingTier] = useState("free");
   const [billingStatus, setBillingStatus] = useState("inactive");
   const [canPublishByPlan, setCanPublishByPlan] = useState(false);
+  const [stripeMode, setStripeMode] = useState("unknown");
+  const [stripeModeMismatch, setStripeModeMismatch] = useState(false);
 
   const canGenerateFromFallback = useMemo(() => {
     if (!profileUrl.trim()) return false;
@@ -81,6 +85,11 @@ export const Dashboard = () => {
   );
 
   const canGenerate = Boolean(selectedBusiness) || (usingFallback && canGenerateFromFallback);
+
+  const enableFallbackForTesting = () => {
+    setUsingFallback(true);
+    setProfileUrl((current) => (current.trim() ? current : DEFAULT_TEST_FALLBACK_URL));
+  };
 
   const getAccessToken = async (): Promise<string> => {
     const { data } = await supabase.auth.getSession();
@@ -108,6 +117,8 @@ export const Dashboard = () => {
       setBusinesses(nextBusinesses);
       if (!nextBusinesses.length) {
         setSelectedBusinessId("");
+        enableFallbackForTesting();
+        setPublishNote(t("dashboard.noteFallbackAutoEnabled"));
         return;
       }
 
@@ -117,6 +128,8 @@ export const Dashboard = () => {
     } catch {
       setBusinesses([]);
       setSelectedBusinessId("");
+      enableFallbackForTesting();
+      setPublishNote(t("dashboard.noteFallbackAutoEnabled"));
     } finally {
       setLoadingBusinesses(false);
     }
@@ -169,10 +182,14 @@ export const Dashboard = () => {
       setBillingTier(payload.tier || "free");
       setBillingStatus(payload.status || "inactive");
       setCanPublishByPlan(Boolean(payload.canPublish));
+      setStripeMode(payload.stripeMode || "unknown");
+      setStripeModeMismatch(Boolean(payload.stripeModeMismatch));
     } catch {
       setBillingTier("free");
       setBillingStatus("inactive");
       setCanPublishByPlan(false);
+      setStripeMode("unknown");
+      setStripeModeMismatch(false);
     } finally {
       setLoadingBilling(false);
     }
@@ -464,6 +481,14 @@ export const Dashboard = () => {
       <section className="panel">
         <h2>{t("dashboard.publishStepTitle")}</h2>
         <p className="muted">{t("dashboard.publishBody")}</p>
+        <p className="muted" style={{ marginBottom: "0.5rem" }}>
+          {t("dashboard.stripeModeLabel", { mode: stripeMode.toUpperCase() })}
+        </p>
+        {stripeModeMismatch && (
+          <p className="warning" style={{ marginTop: "0.8rem" }}>
+            {t("dashboard.stripeModeMismatch")}
+          </p>
+        )}
         <p className="muted" style={{ marginBottom: "0.5rem" }}>
           {loadingBilling
             ? t("dashboard.billingChecking")

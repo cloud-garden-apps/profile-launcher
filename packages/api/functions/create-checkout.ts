@@ -1,6 +1,12 @@
 import type { Context } from "@netlify/functions";
 import { getAppId, handleCors, json, jsonError, requireUser } from "./auth-utils";
-import { APP_ORIGIN_FALLBACK, CHECKOUT_CANCEL_PATH, CHECKOUT_SUCCESS_PATH } from "./constants";
+import {
+  APP_ORIGIN_FALLBACK,
+  CHECKOUT_CANCEL_PATH,
+  CHECKOUT_SUCCESS_PATH,
+  inferStripeModeFromSecretKey,
+  normalizeStripeMode,
+} from "./constants";
 
 export default async (request: Request, _context: Context) => {
   const cors = handleCors(request);
@@ -13,6 +19,14 @@ export default async (request: Request, _context: Context) => {
   const stripeSecretKey = process.env.STRIPE_SECRET_KEY;
   if (!stripeSecretKey) {
     return jsonError("Missing STRIPE_SECRET_KEY", 500);
+  }
+  const configuredMode = normalizeStripeMode(process.env.STRIPE_MODE);
+  const inferredMode = inferStripeModeFromSecretKey(stripeSecretKey);
+  if (configuredMode && inferredMode && configuredMode !== inferredMode) {
+    return jsonError(
+      `Stripe mode mismatch: STRIPE_MODE=${configuredMode} but key is ${inferredMode}. Update STRIPE_MODE or STRIPE_SECRET_KEY.`,
+      500
+    );
   }
 
   try {

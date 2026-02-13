@@ -62,10 +62,13 @@ export const en = {
     publishUnlocked: "Plan active — publish unlocked",
     publishRequiresConnection: "Connect Google Business before publish is enabled.",
     publishRequiresPlan: "Purchase a plan to unlock publish.",
+    stripeModeLabel: "Stripe mode: {{mode}}",
+    stripeModeMismatch: "Stripe mode config mismatch. Checkout is blocked until STRIPE_MODE and STRIPE_SECRET_KEY match.",
     billingChecking: "Checking billing status...",
     billingState: "Current plan: {{tier}} ({{status}})",
 
     noteGoogleConnected: "Google Business Profile connected successfully.",
+    noteFallbackAutoEnabled: "No locations returned. Temporary fallback mode was enabled automatically for testing.",
     noteCheckoutSuccess: "Payment succeeded. Publish is now unlocked.",
     noteCheckoutCancelled: "Checkout was cancelled. You can resume anytime.",
     noteCheckoutNoUrl: "Checkout created, but no URL returned.",

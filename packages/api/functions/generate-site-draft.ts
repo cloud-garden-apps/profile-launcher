@@ -1,4 +1,5 @@
 import type { Context } from "@netlify/functions";
+import { DEFAULT_GOOGLE_MODEL } from "./constants";
 
 type SiteDraft = {
   businessName: string;
@@ -19,7 +20,7 @@ const extractJsonObject = (text: string): SiteDraft => {
 
 const generateDraft = async (input: { profileUrl?: string; businessName?: string }): Promise<SiteDraft> => {
   const apiKey = process.env.GEMINI_API_KEY;
-  const model = process.env.GOOGLE_MODEL || "gemini-2.5-flash-lite";
+  const model = process.env.GOOGLE_MODEL || DEFAULT_GOOGLE_MODEL;
 
   if (!apiKey) {
     throw new Error("Missing GEMINI_API_KEY");
