@@ -11,50 +11,80 @@ type LayoutProps = {
 
 export function Layout({ data, currentPage, enabledPages, children }: LayoutProps) {
   const business = data.business;
-  const theme = data.theme ?? {};
-  const primary = theme.primaryColor ?? "#254336";
-  const accent = theme.accentColor ?? "#6b8f71";
-  const bg = theme.neutralBackground ?? "#f9f8f4";
 
   return (
-    <div className="min-h-screen text-slate-900" style={{ backgroundColor: bg }}>
-      <header className="sticky top-0 z-10 border-b border-slate-200/70 bg-white/90 backdrop-blur">
-        <div className="mx-auto flex w-[min(1100px,92%)] flex-wrap items-center justify-between gap-4 py-4">
-          <a href="/" className="text-sm font-semibold tracking-wide" style={{ color: primary }}>
-            {business.name}
+    <div className="min-h-screen bg-white">
+      {/* Absolute Minimal Header */}
+      <header className="fixed top-0 left-0 right-0 z-[100] px-8 py-10 mix-blend-difference pointer-events-none">
+        <div className="mx-auto flex max-w-[1700px] items-center justify-between pointer-events-auto">
+          <a href="/" className="font-serif text-3xl font-normal tracking-tight text-white hover:italic transition-all">
+            {business.name.split(' ').slice(0, 1).join(' ')}.
           </a>
-          <nav className="flex flex-wrap gap-3 text-sm">
-            {enabledPages.map((page) => (
+
+          <nav className="hidden lg:flex items-center gap-12 text-white">
+            {['Services', 'Reviews', 'Gallery', 'Contact'].map((item) => (
               <a
-                key={page}
-                href={pagePath(page)}
-                aria-current={page === currentPage ? "page" : undefined}
-                className={page === currentPage ? "font-semibold underline underline-offset-4" : ""}
-                style={{ color: page === currentPage ? primary : "#334155" }}
+                key={item}
+                href={`#${item.toLowerCase()}`}
+                className="text-[10px] uppercase font-bold tracking-[0.3em] hover:opacity-50 transition-opacity"
               >
-                {pageTitle(page)}
+                {item}
               </a>
             ))}
           </nav>
+
+          <a
+            href="#contact"
+            className="hidden lg:block border border-white px-8 py-3 text-[10px] uppercase font-bold tracking-[0.3em] text-white hover:bg-white hover:text-black transition-all"
+          >
+            Inquire
+          </a>
         </div>
       </header>
+
+      {/* Main Content */}
       <main>{children}</main>
-      <footer className="mt-14 border-t border-slate-200 bg-white">
-        <div className="mx-auto w-[min(1100px,92%)] py-8 text-sm text-slate-700">
-          <p className="font-semibold" style={{ color: primary }}>
-            {business.name}
-          </p>
-          <p className="mt-1">
-            {business.phone}
-            {business.email ? ` · ${business.email}` : ""}
-          </p>
-          <p className="mt-1">
-            {business.address.street}, {business.address.locality} {business.address.state}{" "}
-            {business.address.postCode}
-          </p>
-          <p className="mt-3 text-xs" style={{ color: accent }}>
-            Built with ProfileLauncher
-          </p>
+
+      {/* Simplified Footer */}
+      <footer className="bg-black py-40 text-white selection:bg-white selection:text-black">
+        <div className="mx-auto max-w-[1400px] px-8">
+          <div className="grid grid-cols-1 gap-32 lg:grid-cols-2">
+            <div>
+              <h2 className="font-serif text-8xl leading-[0.85] tracking-tight mb-20 italic">
+                A refined <br /> approach.
+              </h2>
+              <div className="space-y-4 text-white/40 font-light text-lg">
+                 <p className="max-w-md">{business.description}</p>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-16">
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-white/30 block mb-10">Connect</span>
+                <div className="space-y-4 font-light text-lg">
+                   <p>{business.phone}</p>
+                   <p className="opacity-60">{business.address.street}, {business.address.locality}</p>
+                   <p className="opacity-60">{business.address.state} {business.address.postCode}</p>
+                </div>
+              </div>
+              <div>
+                <span className="text-[10px] uppercase font-bold tracking-[0.3em] text-white/30 block mb-10">Availability</span>
+                <div className="space-y-2 text-sm font-light opacity-60">
+                  {business.hours.map(h => (
+                    <div key={h.day} className="flex justify-between border-b border-white/10 pb-2">
+                      <span>{h.day}</span>
+                      <span>{h.open} – {h.close}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-40 pt-10 border-t border-white/5 flex justify-between items-center opacity-30 text-[9px] uppercase font-bold tracking-[0.4em]">
+            <p>&copy; {new Date().getFullYear()} {business.name}.</p>
+            <p>Built with ProfileLauncher.</p>
+          </div>
         </div>
       </footer>
     </div>

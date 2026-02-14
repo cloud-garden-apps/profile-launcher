@@ -8,48 +8,77 @@ import { getEnabledPages } from "../lib/site-config.js";
 import type { SiteData } from "../types.js";
 
 export function HomePage({ data }: { data: SiteData }) {
-  const enabledPages = getEnabledPages(data);
   const showServices = data.features?.showServices !== false;
   const showReviews = data.features?.showReviews !== false;
   const shouldShowGallery = data.features?.showGallery !== false && data.photos.length > 0;
-  const hasServicesPage = enabledPages.includes("services");
-  const hasReviewsPage = enabledPages.includes("reviews");
 
   return (
-    <>
-      <Hero data={data} showServicesLink={enabledPages.includes("services")} />
-      {showServices ? (
-        <Section title="Services">
-          <ServicesList data={data} limit={3} />
-          {hasServicesPage ? (
-            <p className="mt-4">
-              <a className="text-sm font-semibold text-emerald-700 hover:text-emerald-900" href="/services/">
-                View all services
-              </a>
-            </p>
-          ) : null}
+    <div className="selection:bg-black selection:text-white">
+      <Hero data={data} showServicesLink={false} />
+
+      {/* Philosophy Section - Pure Typography */}
+      <section className="py-60 px-8 bg-white border-t border-black/5">
+        <div className="mx-auto max-w-[1400px]">
+          <h2 className="font-serif text-[clamp(3rem,10vw,8rem)] font-normal leading-[0.85] tracking-tighter text-black max-w-6xl">
+            We believe in the power <br />
+            <span className="italic opacity-30">of absolute simplicity</span> <br />
+            and nurturing care.
+          </h2>
+          <div className="mt-32 grid grid-cols-1 lg:grid-cols-2 gap-20">
+             <div className="text-2xl font-light leading-relaxed text-black/60 max-w-xl">
+               {data.business.description}
+             </div>
+             <div className="flex flex-col justify-end">
+                <span className="text-[10px] uppercase font-bold tracking-[0.4em] text-black/20 block mb-4">— Founder's Philosophy</span>
+             </div>
+          </div>
+        </div>
+      </section>
+
+      {showServices && (
+        <Section title="Offerings" id="services">
+          <ServicesList data={data} limit={6} />
         </Section>
-      ) : null}
-      {showReviews ? (
-        <Section title="What Families Say">
-          <ReviewsList data={data} limit={3} />
-          {hasReviewsPage ? (
-            <p className="mt-4">
-              <a className="text-sm font-semibold text-emerald-700 hover:text-emerald-900" href="/reviews/">
-                Read all reviews
-              </a>
-            </p>
-          ) : null}
+      )}
+
+      {showReviews && (
+        <Section title="Reflections" id="reviews">
+          <ReviewsList data={data} limit={6} />
         </Section>
-      ) : null}
-      {shouldShowGallery ? (
-        <Section title="Gallery">
-          <Gallery data={data} limit={12} />
-          <p className="mt-4 text-sm text-slate-600">
-            Showing a selection of recent photos.
-          </p>
+      )}
+
+      {shouldShowGallery && (
+        <Section title="Gallery" id="gallery">
+          <Gallery data={data} />
         </Section>
-      ) : null}
-    </>
+      )}
+
+      {/* Contact Section - Final Inquiry */}
+      <section id="contact" className="py-60 bg-white border-t border-black/5">
+        <div className="mx-auto max-w-[1700px] px-8 text-center">
+            <span className="text-[10px] uppercase font-bold tracking-[0.5em] text-black/20 block mb-12">Next Steps</span>
+            <h2 className="font-serif text-9xl tracking-tighter mb-24">
+              Join the <span className="italic text-[#8a5f2a]">Family</span>.
+            </h2>
+            <div className="flex flex-col items-center gap-12">
+               <a
+                 href={`tel:${data.business.phone}`}
+                 className="text-4xl font-serif hover:italic transition-all border-b border-black/10 pb-2"
+               >
+                 {data.business.phone}
+               </a>
+               <p className="text-xl font-light text-black/40 max-w-md">
+                 Our doors are open for those seeking a boutique, high-end care environment.
+               </p>
+               <a
+                 href="/contact"
+                 className="mt-10 px-20 py-6 bg-black text-white text-[10px] uppercase font-bold tracking-[0.4em] hover:bg-white hover:text-black hover:border hover:border-black transition-all"
+               >
+                 Detailed Inquiry
+               </a>
+            </div>
+        </div>
+      </section>
+    </div>
   );
 }

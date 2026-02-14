@@ -1,34 +1,49 @@
 # ProfileLauncher — Handover
 
-## Latest Update (February 13, 2026)
+## Latest Update (February 14, 2026)
 
 ### What was shipped in this session
-- Created a first working `packages/site` app using React server rendering to static HTML (SSG-style output in `packages/site/dist`).
-- Switched site styling to Tailwind utilities (removed custom stylesheet dependency).
-- Implemented site-agnostic architecture:
-  - Reusable components in `packages/site/src/components`
-  - Page templates in `packages/site/src/pages`
-  - Data contract in `packages/site/src/types.ts`
-  - Static renderer/build pipeline in `packages/site/src/render-page.tsx` and `packages/site/scripts/build.ts`
-- Implemented feature/page toggles in data model (`features`, `pages`) so optional sections/pages (like reviews) can be enabled/disabled per customer.
-- Loaded Fun With Kids real GBP Takeout data into `packages/site/src/data/site-data.json`:
-  - 20 reviews
-  - 99 photos copied into build output via local asset pipeline
-  - real business details, hours, services, address, service area
-- Adjusted Home page UX so it is now an overview:
-  - preview subset of services/reviews/photos
-  - links to full `/services` and `/reviews` pages
+- **Fun With Kids site deployed to Netlify** at `funwithkidsfdc.com.au`
+  - DNS configured: ALIAS record for apex → `apex-loadbalancer.netlify.com`, CNAME for www
+  - HTTPS via Let's Encrypt (auto-provisioning after DNS propagation)
+  - Awaiting DNS propagation — should be live within minutes (TTL set to 60s)
+- Updated `seo.baseUrl` in site-data.json to `https://funwithkidsfdc.com.au`
+- Curated photos from 99 → 46 (removed unwanted Takeout photos from source)
+- Updated site-data.json to only reference the 46 remaining photos
+- Build script now gracefully skips missing source photos instead of crashing
+- **Image strategy simplified**: photos are included in the Netlify build output (served via Netlify CDN). No Supabase Storage needed — Netlify IS the CDN.
+- Domain purchased: `profilelauncher.com` (owned), `funwithkidsfdc.com.au` (owned)
+
+### Previous session (February 13, 2026)
+- Created `packages/site` — React SSG outputting static HTML with Tailwind
+- Site-agnostic architecture: components, page templates, data contract, build pipeline
+- Feature/page toggles in data model
+- Loaded Fun With Kids GBP Takeout data: 20 reviews, business details, hours, services
+- Home page as overview with preview subsets and links to full pages
 
 ### Current preview/build commands
 - Build: `yarn workspace site build`
 - Local preview: `python3 -m http.server 4173 --directory packages/site/dist`
-- Then open: `http://127.0.0.1:4173/`
+- **Live**: `https://funwithkidsfdc.com.au` (once DNS propagates)
+
+### Deployment method (Fun With Kids)
+- Build locally with `yarn workspace site build`
+- Drag & drop `packages/site/dist/` to Netlify dashboard
+- Photos are copied from local Takeout folder into dist at build time (not in git)
 
 ### Immediate next steps
-1. Replace local photo serving with Supabase Storage CDN URLs in `site-data.json` (or automated upload + URL injection).
-2. Add a simple dashboard/form mapping to generate `features` and `pages` from customer checkboxes.
-3. Deploy `packages/site` to a dedicated Netlify site on the chosen `.com.au` domain.
-4. Update the live GBP website URL to that domain and re-apply for GBP API access.
+1. **Verify funwithkidsfdc.com.au is live** — check DNS propagation and HTTPS cert
+2. **Purchase Cloud Garden domain** — needed as the parent brand referenced by ProfileLauncher
+3. **Upgrade Supabase to Pro** — production-ready auth/database
+4. **Update auth config to point to Pro Cloud Garden Supabase URL** — currently on free tier
+5. **Design and ship ProfileLauncher landing page** to `profilelauncher.com` — needs to reference Cloud Garden as parent brand, not yet designed
+6. **Update Fun With Kids GBP website URL** — change from careforkids.com.au to funwithkidsfdc.com.au
+7. **Re-apply for GBP API access** — the live site on a real domain should unblock the application
+
+### Later improvements (not launch blockers)
+- Improve the site template — polish design, refine copy, improve mobile experience
+- Consider multiple templates
+- Dashboard feature toggles for customers
 
 ## The Big Picture: Cloud Garden / App Factory
 

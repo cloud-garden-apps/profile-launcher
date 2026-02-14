@@ -11,11 +11,21 @@ export function Gallery({ data, limit }: { data: SiteData; limit?: number }) {
   }
 
   return (
-    <div className="mt-5 grid grid-cols-2 gap-3 md:grid-cols-3 lg:grid-cols-4">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {photos.map((photo, idx) => (
-        <figure className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm" key={`${photo.url}-${idx}`}>
-          <img className="h-48 w-full object-cover" src={photo.url} alt={photo.alt} loading="lazy" />
-        </figure>
+        <div
+          key={`${photo.url}-${idx}`}
+          className={`relative overflow-hidden group bg-slate-100 aspect-[3/4] ${
+            idx % 4 === 0 ? 'lg:aspect-[16/9] lg:col-span-2' : ''
+          }`}
+        >
+          <img
+            className="h-full w-full object-cover grayscale brightness-110 hover:grayscale-0 hover:brightness-100 transition-all duration-[2s] ease-in-out"
+            src={photo.url}
+            alt={photo.alt}
+            loading="lazy"
+          />
+        </div>
       ))}
     </div>
   );

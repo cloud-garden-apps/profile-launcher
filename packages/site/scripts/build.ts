@@ -36,7 +36,11 @@ async function copyLocalPhotos(data: SiteData) {
     const relativeUrl = photo.url.startsWith("/") ? photo.url.slice(1) : photo.url;
     const targetPath = path.join(DIST_DIR, relativeUrl);
     await fs.mkdir(path.dirname(targetPath), { recursive: true });
-    await fs.copyFile(sourcePath, targetPath);
+    try {
+      await fs.copyFile(sourcePath, targetPath);
+    } catch {
+      // Source photo removed — skip it
+    }
   }
 }
 
